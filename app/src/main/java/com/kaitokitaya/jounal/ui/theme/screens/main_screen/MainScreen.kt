@@ -53,6 +53,7 @@ import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
 import com.kaitokitaya.jounal.ui.theme.util.Util
 import java.time.LocalDate
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kaitokitaya.jounal.type_define.VoidCallback
 
 private const val TAG = "MainScreen"
 
@@ -63,7 +64,25 @@ fun MainScreen(
 ) {
     rememberTopAppBarState()
     val count by viewModel.count.collectAsState()
+    val date by viewModel.monthlyDate.collectAsState()
+    MainContent(
+        count = count.count,
+        date = date,
+        increase = { viewModel.increase() },
+        forwardDate = { viewModel.forwardMonth() },
+        backDate = { viewModel.backMonth() },
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainContent(
+    count: Int,
+    date: LocalDate,
+    increase: VoidCallback,
+    forwardDate: VoidCallback,
+    backDate: VoidCallback
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -80,7 +99,7 @@ fun MainScreen(
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text("Calender ${count.count}")
+                    Text("Calender $count")
                 },
                 modifier = Modifier.padding(0.dp),
                 actions = {
@@ -89,9 +108,7 @@ fun MainScreen(
             )
         },
         floatingActionButton = {
-            IconButton(onClick = {
-                viewModel.increase()
-            }) {
+            IconButton(onClick = increase) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         }
@@ -101,7 +118,7 @@ fun MainScreen(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
-            MonthlyBar()
+            MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
             WeeklyBar()
             MonthlyContents()
             Divider()
@@ -113,25 +130,25 @@ fun MainScreen(
             ) {
 
             }
-            }
         }
     }
+}
 
 @Composable
-fun MonthlyBar() {
+fun MonthlyBar(date: LocalDate, forwardDate: VoidCallback, backDate: VoidCallback) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
-        IconButton(onClick = { Log.d(TAG, "slide left") }) {
+        IconButton(onClick = backDate) {
             Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "previous")
         }
-        Text(text = "May", fontSize = 24.sp)
+        Text(text = "${date.month}", fontSize = 24.sp)
         Text(
-            text = "2024", modifier = Modifier.padding(8.dp), fontSize = 24.sp
+            text = "${date.year}", modifier = Modifier.padding(8.dp), fontSize = 24.sp
         )
-        IconButton(onClick = { Log.d(TAG, "slide right") }) {
+        IconButton(onClick = forwardDate) {
             Icon(Icons.Default.KeyboardArrowRight, contentDescription = "next")
         }
     }
