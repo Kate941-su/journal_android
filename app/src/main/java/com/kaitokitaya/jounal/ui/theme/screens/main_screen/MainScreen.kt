@@ -46,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import com.kaitokitaya.jounal.data.model.JournalDate
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.components.JournalPreviewCard
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
@@ -54,8 +53,10 @@ import com.kaitokitaya.jounal.ui.theme.util.Util
 import java.time.LocalDate
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kaitokitaya.jounal.type_define.VoidCallback
+import kotlin.math.ceil
 
 private const val TAG = "MainScreen"
+private const val WEEK_DAYS = 7
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,9 +66,11 @@ fun MainScreen(
     rememberTopAppBarState()
     val count by viewModel.count.collectAsState()
     val date by viewModel.monthlyDate.collectAsState()
+    val monthlyDays by viewModel.monthlyDays.collectAsState()
     MainContent(
         count = count.count,
         date = date,
+        monthlyDays = monthlyDays,
         increase = { viewModel.increase() },
         forwardDate = { viewModel.forwardMonth() },
         backDate = { viewModel.backMonth() },
@@ -79,6 +82,7 @@ fun MainScreen(
 fun MainContent(
     count: Int,
     date: LocalDate,
+    monthlyDays: List<Int?>,
     increase: VoidCallback,
     forwardDate: VoidCallback,
     backDate: VoidCallback
@@ -120,7 +124,7 @@ fun MainContent(
         ) {
             MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
             WeeklyBar()
-            MonthlyContents()
+            MonthlyContents(monthlyDays = monthlyDays)
             Divider()
             Box(
                 modifier = Modifier
@@ -183,13 +187,15 @@ fun DayItem(day: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MonthlyContents() {
+fun MonthlyContents(monthlyDays: List<Int?>) {
     Column {
-        /// TODO: The following implementation is dummy
-        repeat(6) {
+        val outerLoopNum = ceil(monthlyDays.size.toFloat() / WEEK_DAYS).toInt()
+        var count = 0
+        for (i in 0 until outerLoopNum) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                repeat(7) {
-                    MonthlyContentItem(date = JournalDate(date = null), modifier = Modifier.padding(all = 2.dp))
+                for (j in 0 until WEEK_DAYS) {
+                    MonthlyContentItem(date = monthlyDays[count], modifier = Modifier.padding(all = 2.dp))
+                    count++
                 }
             }
         }
@@ -198,7 +204,7 @@ fun MonthlyContents() {
 
 @Composable
 fun MonthlyContentItem(
-    date: JournalDate,
+    date: Int?,
     modifier: Modifier = Modifier
 ) {
     val configuration = Util.getPlatformConfiguration()
@@ -215,7 +221,7 @@ fun MonthlyContentItem(
     ) {
         Text(
             textAlign = TextAlign.Center,
-            text = "${date.date?.dayOfMonth ?: "1"}",
+            text = "${date ?: ""}",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxWidth()
         )
