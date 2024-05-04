@@ -38,4 +38,9 @@ object Util {
             else -> weekIndex
         }
     }
+
+    fun createJournalIdFromLocalDate(year: Int, month: Int, day: Int): Int {
+        return year * 10000 + month * 100 + day
+    }
+
 }

@@ -61,7 +61,8 @@ private const val WEEK_DAYS = 7
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    viewModel: MainScreenViewModel = viewModel()
+    viewModel: MainScreenViewModel = viewModel(),
+    onTapDate: (Int) -> Unit
 ) {
     rememberTopAppBarState()
     val count by viewModel.count.collectAsState()
@@ -74,6 +75,7 @@ fun MainScreen(
         increase = { viewModel.increase() },
         forwardDate = { viewModel.forwardMonth() },
         backDate = { viewModel.backMonth() },
+        onTapDate = onTapDate,
     )
 }
 
@@ -85,7 +87,8 @@ fun MainContent(
     monthlyDays: List<Int?>,
     increase: VoidCallback,
     forwardDate: VoidCallback,
-    backDate: VoidCallback
+    backDate: VoidCallback,
+    onTapDate: (Int) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -124,7 +127,7 @@ fun MainContent(
         ) {
             MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
             WeeklyBar()
-            MonthlyContents(monthlyDays = monthlyDays)
+            MonthlyContents(month = date, monthlyDays = monthlyDays, onTapDate = onTapDate)
             Divider()
             Box(
                 modifier = Modifier
@@ -187,14 +190,19 @@ fun DayItem(day: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MonthlyContents(monthlyDays: List<Int?>) {
+fun MonthlyContents(month: LocalDate, monthlyDays: List<Int?>, onTapDate: (Int) -> Unit) {
     Column {
         val outerLoopNum = ceil(monthlyDays.size.toFloat() / WEEK_DAYS).toInt()
         var count = 0
         for (i in 0 until outerLoopNum) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 for (j in 0 until WEEK_DAYS) {
-                    MonthlyContentItem(date = monthlyDays[count], modifier = Modifier.padding(all = 2.dp))
+                    MonthlyContentItem(
+                        day = monthlyDays[count],
+                        localDate = month,
+                        modifier = Modifier.padding(all = 2.dp),
+                        onTapDate = onTapDate
+                    )
                     count++
                 }
             }
@@ -204,24 +212,38 @@ fun MonthlyContents(monthlyDays: List<Int?>) {
 
 @Composable
 fun MonthlyContentItem(
-    date: Int?,
-    modifier: Modifier = Modifier
+    day: Int?,
+    localDate: LocalDate,
+    modifier: Modifier = Modifier,
+    onTapDate: (Int) -> Unit
 ) {
     val configuration = Util.getPlatformConfiguration()
+    val id = if (day != null) {
+        Util.createJournalIdFromLocalDate(
+            year = localDate.year,
+            month = localDate.month.value,
+            day = day
+        )
+    } else {
+        -1
+    }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .background(
-                color = Color.Green
+                color = Color.Green.copy(alpha = if (day == null) 0.5F else 1F)
             )
             .clickable {
-                Log.d(TAG, "date tapped")
+                day?.let {
+                    onTapDate(id)
+                }
             }
             .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8)
     ) {
         Text(
             textAlign = TextAlign.Center,
-            text = "${date ?: ""}",
+            text = "${day ?: ""}",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxWidth()
         )
@@ -232,5 +254,7 @@ fun MonthlyContentItem(
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
+    MainScreen() {
+
+    }
 }
