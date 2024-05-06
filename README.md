@@ -39,5 +39,16 @@ But after a day, I could understand that there are some components in the closur
 arguments are attributes of each componet.
 
 
+## Data Structure
+
+### JournalData
+```
+
+
+
+```
+
+
+
 
 
