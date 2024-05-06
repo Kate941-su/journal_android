@@ -3,7 +3,6 @@ package com.kaitokitaya.jounal.ui.theme.util
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
-import com.kaitokitaya.jounal.data.model.WeeklyNumber
 import java.time.DayOfWeek
 import java.time.LocalDate
 

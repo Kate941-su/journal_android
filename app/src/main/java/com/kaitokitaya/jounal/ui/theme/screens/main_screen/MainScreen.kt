@@ -52,6 +52,7 @@ import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
 import com.kaitokitaya.jounal.ui.theme.util.Util
 import java.time.LocalDate
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kaitokitaya.jounal.repository.MockedJournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
 import com.kaitokitaya.jounal.ui.theme.theme.AppColor
 import kotlin.math.ceil
@@ -62,7 +63,7 @@ private const val WEEK_DAYS = 7
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    viewModel: MainScreenViewModel = viewModel(),
+    viewModel: MainScreenViewModel,
     onTapDate: (Int) -> Unit
 ) {
     rememberTopAppBarState()
@@ -255,7 +256,7 @@ fun MonthlyContentItem(
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen() {
+    MainScreen(viewModel = MainScreenViewModel(journalRepository = MockedJournalRepository())) {
 
     }
 }

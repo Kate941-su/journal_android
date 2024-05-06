@@ -12,8 +12,8 @@ import java.time.LocalDate
 
 @Entity(tableName = "journal_table")
 data class Journal(
-    @PrimaryKey
-    val primKey: Int,
+    @PrimaryKey(autoGenerate = true)
+    val primKey: Int? = null,
     @ColumnInfo(name = "id")
     val id: Int,
     @ColumnInfo(name = "local_date")

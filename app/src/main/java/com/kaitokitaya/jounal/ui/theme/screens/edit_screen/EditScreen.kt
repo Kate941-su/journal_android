@@ -36,22 +36,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
+import com.kaitokitaya.jounal.data.model.Journal
+import com.kaitokitaya.jounal.repository.MockedJournalRepository
+import com.kaitokitaya.jounal.repository.RoomJournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.MainScreen
 import com.kaitokitaya.jounal.ui.theme.theme.AppColor
 import com.kaitokitaya.jounal.ui.theme.util.Util
+import java.time.LocalDate
 
 private const val TAG = "Edit Screen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditScreen(journalId: Int, viewModel: EditScreenViewModel = viewModel(), onBackMainScreen: VoidCallback) {
+fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen: VoidCallback) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
+    val localDate = Util.getLocalDateFromId(journalId)
     EditContents(
         journalId = journalId,
-        onBackMainScreen = onBackMainScreen,
+        onBackMainScreen = {
+            viewModel.onBackMain(
+                journal = Journal(
+                    id = journalId,
+                    date = localDate,
+                    title = title,
+                    content = content,
+                )
+            )
+            onBackMainScreen()
+        },
         title = title,
         onTitleChanged = { title = it },
         content = content,
@@ -135,8 +152,7 @@ fun EditContents(
 @Preview(showSystemUi = true)
 @Composable
 fun EditScreenPreview() {
-    EditScreen(journalId = 20000101) {
-
+    EditScreen(journalId = 20000101, viewModel = EditScreenViewModel(repository = MockedJournalRepository())) {
     }
 }
 

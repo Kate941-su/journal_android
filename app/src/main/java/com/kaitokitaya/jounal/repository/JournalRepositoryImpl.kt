@@ -3,8 +3,9 @@ package com.kaitokitaya.jounal.repository
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.data.model.JournalDAO
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class RoomJournalRepository(private val journalDAO: JournalDAO) : JournalRepository {
+class RoomJournalRepository @Inject constructor(private val journalDAO: JournalDAO) : JournalRepository {
     override suspend fun insertJournal(journal: Journal) = journalDAO.insertJournal(journal)
 
     override suspend fun updateJournal(journal: Journal) = journalDAO.updateJournal(journal)
