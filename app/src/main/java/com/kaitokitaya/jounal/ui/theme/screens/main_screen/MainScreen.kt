@@ -52,6 +52,7 @@ import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
 import com.kaitokitaya.jounal.ui.theme.util.Util
 import java.time.LocalDate
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.repository.MockedJournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
 import com.kaitokitaya.jounal.ui.theme.theme.AppColor
@@ -70,10 +71,12 @@ fun MainScreen(
     val count by viewModel.count.collectAsState()
     val date by viewModel.monthlyDate.collectAsState()
     val monthlyDays by viewModel.monthlyDays.collectAsState()
+    val allJournals by viewModel.allJournals.collectAsState()
     MainContent(
         count = count.count,
         date = date,
         monthlyDays = monthlyDays,
+        allJournals = allJournals,
         increase = { viewModel.increase() },
         forwardDate = { viewModel.forwardMonth() },
         backDate = { viewModel.backMonth() },
@@ -87,6 +90,7 @@ fun MainContent(
     count: Int,
     date: LocalDate,
     monthlyDays: List<Int?>,
+    allJournals: List<Journal>,
     increase: VoidCallback,
     forwardDate: VoidCallback,
     backDate: VoidCallback,
@@ -129,7 +133,7 @@ fun MainContent(
         ) {
             MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
             WeeklyBar()
-            MonthlyContents(month = date, monthlyDays = monthlyDays, onTapDate = onTapDate)
+            MonthlyContents(month = date, monthlyDays = monthlyDays, allJournals = allJournals, onTapDate = onTapDate)
             Divider()
             Box(
                 modifier = Modifier
@@ -192,7 +196,7 @@ fun DayItem(day: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MonthlyContents(month: LocalDate, monthlyDays: List<Int?>, onTapDate: (Int) -> Unit) {
+fun MonthlyContents(month: LocalDate, monthlyDays: List<Int?>, allJournals: List<Journal>, onTapDate: (Int) -> Unit) {
     Column {
         val outerLoopNum = ceil(monthlyDays.size.toFloat() / WEEK_DAYS).toInt()
         var count = 0
@@ -203,6 +207,7 @@ fun MonthlyContents(month: LocalDate, monthlyDays: List<Int?>, onTapDate: (Int) 
                         day = monthlyDays[count],
                         localDate = month,
                         modifier = Modifier.padding(all = 2.dp),
+                        allJournals = allJournals,
                         onTapDate = onTapDate
                     )
                     count++
@@ -217,9 +222,11 @@ fun MonthlyContentItem(
     day: Int?,
     localDate: LocalDate,
     modifier: Modifier = Modifier,
+    allJournals: List<Journal>,
     onTapDate: (Int) -> Unit
 ) {
     val configuration = Util.getPlatformConfiguration()
+    val allJournalIds = allJournals.map { it.id }
     val id = if (day != null) {
         Util.createJournalIdFromLocalDate(
             year = localDate.year,
@@ -234,7 +241,7 @@ fun MonthlyContentItem(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .background(
-                color = Color.Green.copy(alpha = if (day == null) 0.5F else 1F)
+                color = if (allJournalIds.contains(id)) Color.Blue else Color.Green.copy(alpha = if (day == null) 0.5F else 1F)
             )
             .clickable {
                 day?.let {

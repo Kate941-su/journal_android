@@ -35,6 +35,7 @@ class MainScreenViewModel @Inject constructor(private val journalRepository: Jou
     val monthlyDays: StateFlow<List<Int?>> = _monthlyDays.asStateFlow()
 
     private val _allJournals = MutableStateFlow<List<Journal>>(emptyList())
+    val allJournals: StateFlow<List<Journal>> = _allJournals.asStateFlow()
 
     init {
         viewModelScope.launch {

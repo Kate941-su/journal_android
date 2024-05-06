@@ -16,11 +16,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EditScreenViewModel @Inject constructor(private val repository: JournalRepository): ViewModel() {
+class EditScreenViewModel @Inject constructor(private val repository: JournalRepository) : ViewModel() {
 
     private val _allJournals = MutableStateFlow<List<Journal>>(emptyList())
 
-    val allJournals: StateFlow<List<Journal>> = _allJournals.asStateFlow()
+    private val allJournals: StateFlow<List<Journal>> = _allJournals.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -32,7 +32,12 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
 
     fun onBackMain(journal: Journal) {
         viewModelScope.launch {
-            repository.insertJournal(journal)
+            if (allJournals.value.map { it.id }.contains(journal.id)) {
+                repository.updateJournal(journal)
+            } else {
+                repository.insertJournal(journal)
+            }
+
         }
     }
 }
