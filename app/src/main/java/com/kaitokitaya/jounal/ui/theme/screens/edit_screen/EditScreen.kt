@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,26 +54,29 @@ private const val TAG = "Edit Screen"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen: VoidCallback) {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
+    viewModel.initializeJournalById(journalId)
+    val journalById = viewModel.journalById.collectAsState()
     val localDate = Util.getLocalDateFromId(journalId)
     EditContents(
         journalId = journalId,
         onBackMainScreen = {
-            viewModel.onBackMain(
-                journal = Journal(
-                    id = journalId,
-                    date = localDate,
-                    title = title,
-                    content = content,
+            // Only journal has created, viewModel.onBackMain will be called.
+            journalById.value?.let {
+                viewModel.onBackMain(
+                    journal = Journal(
+                        id = journalId,
+                        date = localDate,
+                        title = it.title,
+                        content = it.content,
+                    )
                 )
-            )
+            }
             onBackMainScreen()
         },
-        title = title,
-        onTitleChanged = { title = it },
-        content = content,
-        onContentChanged = { content = it }
+        title = journalById.value?.title ?: "",
+        onTitleChanged = { viewModel.setTitle(it) },
+        content = journalById.value?.content ?: "",
+        onContentChanged = { viewModel.setContent(it) },
     )
 }
 
@@ -152,7 +156,7 @@ fun EditContents(
 @Preview(showSystemUi = true)
 @Composable
 fun EditScreenPreview() {
-    EditScreen(journalId = 20000101, viewModel = EditScreenViewModel(repository = MockedJournalRepository())) {
+        EditScreen(journalId = 20000101, viewModel = EditScreenViewModel(repository = MockedJournalRepository())) {
     }
 }
 
