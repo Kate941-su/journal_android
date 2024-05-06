@@ -11,12 +11,14 @@ import androidx.navigation.compose.rememberNavController
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.EditScreen
 import com.kaitokitaya.jounal.ui.theme.theme.JounalTheme
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.MainScreen
+import dagger.hilt.android.AndroidEntryPoint
 
 enum class AppPath(val path: String) {
     MAIN_SCREEN("main_screen"),
     EDIT_SCREEN("edit_screen")
 }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

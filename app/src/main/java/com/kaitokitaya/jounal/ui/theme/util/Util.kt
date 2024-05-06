@@ -8,6 +8,9 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 object Util {
+    private val yearToIdTerm = 10000
+    private val monthToIdTerm = 100
+
     @Composable
     fun getPlatformConfiguration(): Configuration {
         return LocalConfiguration.current
@@ -41,6 +44,13 @@ object Util {
 
     fun createJournalIdFromLocalDate(year: Int, month: Int, day: Int): Int {
         return year * 10000 + month * 100 + day
+    }
+
+    fun getLocalDateFromId(id: Int): LocalDate {
+        val year = (id / yearToIdTerm)
+        val month = (id - year * yearToIdTerm) / monthToIdTerm
+        val day = (id - year * yearToIdTerm - month * monthToIdTerm)
+        return LocalDate.of(year, month, day)
     }
 
 }

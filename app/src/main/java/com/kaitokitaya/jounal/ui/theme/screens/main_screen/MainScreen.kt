@@ -53,6 +53,7 @@ import com.kaitokitaya.jounal.ui.theme.util.Util
 import java.time.LocalDate
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kaitokitaya.jounal.type_define.VoidCallback
+import com.kaitokitaya.jounal.ui.theme.theme.AppColor
 import kotlin.math.ceil
 
 private const val TAG = "MainScreen"
@@ -102,7 +103,7 @@ fun MainContent(
                     }
                 },
                 colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = AppColor.appBarColorLightTheme,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
