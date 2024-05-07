@@ -1,17 +1,14 @@
 package com.kaitokitaya.jounal.ui.theme.screens.edit_screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,55 +25,72 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.kaitokitaya.jounal.R
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.repository.MockedJournalRepository
-import com.kaitokitaya.jounal.repository.RoomJournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
+import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.ui_data.DropDownItem
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreenViewModel
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.MainScreen
+import com.kaitokitaya.jounal.ui.theme.screens.shared_components.JournalAppDropDownMenu
 import com.kaitokitaya.jounal.ui.theme.theme.AppColor
 import com.kaitokitaya.jounal.ui.theme.util.Util
-import java.time.LocalDate
 
 private const val TAG = "Edit Screen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen: VoidCallback) {
+
+    // Initialize
     viewModel.initializeJournalById(journalId)
     val journalById = viewModel.journalById.collectAsState()
+    val title = viewModel.title.collectAsState()
+    val content = viewModel.content.collectAsState()
     val localDate = Util.getLocalDateFromId(journalId)
+    var isExpanded by remember {
+        mutableStateOf(false)
+    }
+    val onBackMain: VoidCallback = {
+        journalById.value?.let {
+            viewModel.onSave(
+                journal = Journal(
+                    id = journalId,
+                    date = localDate,
+                    title = it.title,
+                    content = it.content,
+                )
+            )
+        }
+        onBackMainScreen()
+    }
+    // End Initialize
     EditContents(
         journalId = journalId,
-        onBackMainScreen = {
-            // Only journal has created, viewModel.onBackMain will be called.
-            journalById.value?.let {
-                viewModel.onBackMain(
-                    journal = Journal(
-                        id = journalId,
-                        date = localDate,
-                        title = it.title,
-                        content = it.content,
-                    )
-                )
-            }
-            onBackMainScreen()
-        },
+        onBackMainScreen = onBackMainScreen,
         title = journalById.value?.title ?: "",
         onTitleChanged = { viewModel.setTitle(it) },
         content = journalById.value?.content ?: "",
         onContentChanged = { viewModel.setContent(it) },
+        onTapCascadeMenu = { isExpanded = true },
+        onDismissRequest = { isExpanded = false },
+        isExpanded = isExpanded,
+        onClickSave = onBackMain,
+        onClickDelete = {
+            journalById.value?.let {
+                viewModel.onClickDelete(it)
+                onBackMainScreen()
+            }
+        },
     )
 }
 
@@ -88,7 +102,12 @@ fun EditContents(
     title: String,
     onTitleChanged: (String) -> Unit,
     content: String,
-    onContentChanged: (String) -> Unit
+    onContentChanged: (String) -> Unit,
+    onTapCascadeMenu: (Boolean) -> Unit,
+    onDismissRequest: (Boolean) -> Unit,
+    isExpanded: Boolean,
+    onClickSave: VoidCallback,
+    onClickDelete: VoidCallback,
 ) {
     val localDate = Util.getLocalDateFromId(journalId)
     Scaffold(
@@ -115,13 +134,19 @@ fun EditContents(
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 actions = {
-                    IconButton(onClick = { Log.d(TAG, "Open Menu") }) {
+                    IconButton(onClick = { onTapCascadeMenu(true) }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "menu")
                     }
                 },
             )
         },
     ) { innerPadding ->
+        JournalAppDropDownMenu(
+            isExpanded = isExpanded,
+            onDismissRequest = { onDismissRequest(false) },
+            onSave = onClickSave,
+            onDelete = onClickDelete,
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -156,7 +181,7 @@ fun EditContents(
 @Preview(showSystemUi = true)
 @Composable
 fun EditScreenPreview() {
-        EditScreen(journalId = 20000101, viewModel = EditScreenViewModel(repository = MockedJournalRepository())) {
+    EditScreen(journalId = 20000101, viewModel = EditScreenViewModel(repository = MockedJournalRepository())) {
     }
 }
 

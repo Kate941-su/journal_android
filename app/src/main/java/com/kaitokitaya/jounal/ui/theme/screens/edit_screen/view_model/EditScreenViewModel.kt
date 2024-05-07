@@ -28,6 +28,11 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
 
     val journalById: StateFlow<Journal?> = _journalById.asStateFlow()
 
+    private val _title = MutableStateFlow<String>("")
+    var title: StateFlow<String> = _title.asStateFlow()
+
+    private val _content = MutableStateFlow<String>("")
+    var content: StateFlow<String> = _content.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -37,13 +42,19 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
         }
     }
 
-    fun onBackMain(journal: Journal) {
+    fun onSave(journal: Journal) {
         viewModelScope.launch {
             if (allJournals.value.map { it.id }.contains(journal.id)) {
                 repository.updateJournal(journal)
             } else {
                 repository.insertJournal(journal)
             }
+        }
+    }
+
+    fun onClickDelete(journal: Journal) {
+        viewModelScope.launch {
+            repository.deleteJournal(journal)
         }
     }
 
@@ -64,9 +75,9 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
         }
     }
 
-    fun setContent(title: String) {
+    fun setContent(content: String) {
         _journalById.update {
-            it?.copy(title = title)
+            it?.copy(content = content)d
         }
     }
 
