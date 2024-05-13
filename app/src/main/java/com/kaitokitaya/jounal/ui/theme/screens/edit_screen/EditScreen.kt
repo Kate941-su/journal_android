@@ -1,5 +1,6 @@
 package com.kaitokitaya.jounal.ui.theme.screens.edit_screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,10 +21,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kaitokitaya.jounal.R
 import com.kaitokitaya.jounal.data.model.Journal
@@ -44,6 +49,7 @@ import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreen
 import com.kaitokitaya.jounal.ui.theme.screens.shared_components.JournalAppDropDownMenu
 import com.kaitokitaya.jounal.ui.theme.theme.AppColor
 import com.kaitokitaya.jounal.ui.theme.util.Util
+import kotlinx.coroutines.launch
 
 private const val TAG = "Edit Screen"
 
@@ -51,45 +57,59 @@ private const val TAG = "Edit Screen"
 @Composable
 fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen: VoidCallback) {
 
-    // Initialize
-    viewModel.initializeJournalById(journalId)
-    val journalById = viewModel.journalById.collectAsState()
+    val localDate = Util.getLocalDateFromId(journalId)
     val title = viewModel.title.collectAsState()
     val content = viewModel.content.collectAsState()
-    val localDate = Util.getLocalDateFromId(journalId)
+
     var isExpanded by remember {
         mutableStateOf(false)
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.initializeEditScreen(journalId)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.setTitle("")
+            viewModel.setContent("")
+        }
+    }
+
     val onBackMain: VoidCallback = {
-        journalById.value?.let {
+        if (title.value.isNotEmpty() || content.value.isNotEmpty()) {
             viewModel.onSave(
                 journal = Journal(
                     id = journalId,
                     date = localDate,
-                    title = it.title,
-                    content = it.content,
+                    title = title.value,
+                    content = content.value,
                 )
             )
         }
+
         onBackMainScreen()
     }
+
     // End Initialize
     EditContents(
         journalId = journalId,
-        onBackMainScreen = onBackMainScreen,
-        title = journalById.value?.title ?: "",
-        onTitleChanged = { viewModel.setTitle(it) },
-        content = journalById.value?.content ?: "",
-        onContentChanged = { viewModel.setContent(it) },
+        onBackMainScreen = onBackMain,
+        title = title.value,
+        onTitleChanged = {
+            viewModel.setTitle(it)
+        },
+        content = content.value,
+        onContentChanged = {
+            viewModel.setContent(it)
+        },
         onTapCascadeMenu = { isExpanded = true },
         onDismissRequest = { isExpanded = false },
         isExpanded = isExpanded,
         onClickSave = onBackMain,
         onClickDelete = {
-            journalById.value?.let {
-                viewModel.onClickDelete(it)
-                onBackMainScreen()
-            }
+            viewModel.deleteJournalById(journalId)
+            onBackMainScreen()
         },
     )
 }

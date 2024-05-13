@@ -9,6 +9,8 @@ import com.kaitokitaya.jounal.data.model.JournalDatabase
 import com.kaitokitaya.jounal.repository.JournalRepository
 import com.kaitokitaya.jounal.repository.RoomJournalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,10 +25,6 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
     private val _allJournals = MutableStateFlow<List<Journal>>(emptyList())
 
     private val allJournals: StateFlow<List<Journal>> = _allJournals.asStateFlow()
-
-    private val _journalById = MutableStateFlow<Journal?>(null)
-
-    val journalById: StateFlow<Journal?> = _journalById.asStateFlow()
 
     private val _title = MutableStateFlow<String>("")
     var title: StateFlow<String> = _title.asStateFlow()
@@ -52,42 +50,59 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
         }
     }
 
+    fun deleteJournalById(id: Int) {
+        viewModelScope.launch {
+            val journal = repository.getJournalStream(id)
+            journal.collect { res ->
+                res?.let {
+                    repository.deleteJournal(it)
+                }
+            }
+        }
+    }
+
     fun onClickDelete(journal: Journal) {
         viewModelScope.launch {
             repository.deleteJournal(journal)
         }
     }
 
-    fun initializeJournalById(id: Int) {
-        viewModelScope.launch {
-            repository.getJournalStream(id).collect {journal ->
-                Log.d(TAG, journal.toString())
-                _journalById.update {
-                    journal
-                }
-            }
-        }
-    }
 
     fun setTitle(title: String) {
-        _journalById.update {
-            it?.copy(title = title)
+        _title.update {
+            title
         }
     }
 
     fun setContent(content: String) {
-        _journalById.update {
-            it?.copy(content = content)d
+        _content.update {
+            content
         }
-    }
-
-    companion object {
-        private val TAG = this::class.java.simpleName
     }
 
     override fun onCleared() {
         Log.d(TAG, "Viewmodel disposed")
         super.onCleared()
     }
+
+    fun initializeEditScreen(id: Int) {
+        viewModelScope.launch {
+            repository.getJournalStream(id).collect { journal ->
+                Log.d(TAG, "ID: $id")
+                Log.d(TAG, "Title: ${journal?.title.toString()}")
+                Log.d(TAG, "Content: ${journal?.content.toString()}")
+                journal?.let {
+                    setTitle(it.title)
+                    setContent(it.content)
+                }
+            }
+        }
+    }
+
+
+    companion object {
+        private val TAG = this::class.java.simpleName
+    }
+
 
 }

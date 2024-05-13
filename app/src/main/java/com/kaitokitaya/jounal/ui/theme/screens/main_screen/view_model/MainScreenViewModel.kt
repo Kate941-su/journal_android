@@ -47,7 +47,6 @@ class MainScreenViewModel @Inject constructor(private val journalRepository: Jou
 
     fun backMonth() {
         val newDate = _monthlyDate.value.minusMonths(1L)
-        val dummy = Util.getMonthlyJournalDateList(newDate)
         _monthlyDate.update {
             newDate
         }
