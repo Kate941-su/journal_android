@@ -71,23 +71,22 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
 
     DisposableEffect(Unit) {
         onDispose {
+            if (title.value.isNotEmpty() || content.value.isNotEmpty()) {
+                viewModel.onSave(
+                    journal = Journal(
+                        id = journalId,
+                        date = localDate,
+                        title = title.value,
+                        content = content.value,
+                    )
+                )
+            }
             viewModel.setTitle("")
             viewModel.setContent("")
         }
     }
 
     val onBackMain: VoidCallback = {
-        if (title.value.isNotEmpty() || content.value.isNotEmpty()) {
-            viewModel.onSave(
-                journal = Journal(
-                    id = journalId,
-                    date = localDate,
-                    title = title.value,
-                    content = content.value,
-                )
-            )
-        }
-
         onBackMainScreen()
     }
 
