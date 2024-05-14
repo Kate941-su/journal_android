@@ -15,6 +15,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -38,10 +40,12 @@ class MainScreenViewModel @Inject constructor(private val journalRepository: Jou
     val allJournals: StateFlow<List<Journal>> = _allJournals.asStateFlow()
 
     init {
+        initializeMainScreen()
+    }
+
+    fun initializeMainScreen() {
         viewModelScope.launch {
-            journalRepository.getAllJournalStream().collect {
-                _allJournals.value = it
-            }
+            _allJournals.value = journalRepository.getAllJournalStream().first()
         }
     }
 

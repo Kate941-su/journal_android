@@ -8,6 +8,7 @@ import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.data.model.JournalDatabase
 import com.kaitokitaya.jounal.repository.JournalRepository
 import com.kaitokitaya.jounal.repository.RoomJournalRepository
+import com.kaitokitaya.jounal.type_define.VoidCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,51 +25,34 @@ import javax.inject.Inject
 @HiltViewModel
 class EditScreenViewModel @Inject constructor(private val repository: JournalRepository) : ViewModel() {
 
-    private val _allJournals = MutableStateFlow<List<Journal>>(emptyList())
-
-    private val allJournals: StateFlow<List<Journal>> = _allJournals.asStateFlow()
-
     private val _title = MutableStateFlow<String>("")
     var title: StateFlow<String> = _title.asStateFlow()
 
     private val _content = MutableStateFlow<String>("")
     var content: StateFlow<String> = _content.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            repository.getAllJournalStream().collect {
-                _allJournals.value = it
-            }
-        }
-    }
 
-    fun onSave(journal: Journal) {
+    fun onSave(journal: Journal, completion: VoidCallback? = null) {
         viewModelScope.launch {
-            if (allJournals.value.map { it.id }.contains(journal.id)) {
-                repository.updateJournal(journal)
-            } else {
+            val result = repository.getJournalStream(journal.id).firstOrNull()
+            if (result == null) {
                 repository.insertJournal(journal)
+            } else {
+                repository.updateJournal(journal)
             }
+            completion?.invoke()
         }
     }
 
-    fun deleteJournalById(id: Int) {
+    fun deleteJournalById(id: Int, completion: VoidCallback? = null) {
         viewModelScope.launch {
-            val journal = repository.getJournalStream(id)
-            journal.collect { res ->
-                res?.let {
-                    repository.deleteJournal(it)
-                }
+            val journal = repository.getJournalStream(id).firstOrNull()
+            journal?.let {
+                repository.deleteJournal(journal)
             }
+            completion?.invoke()
         }
     }
-
-    fun onClickDelete(journal: Journal) {
-        viewModelScope.launch {
-            repository.deleteJournal(journal)
-        }
-    }
-
 
     fun setTitle(title: String) {
         _title.update {
@@ -89,12 +75,14 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
         viewModelScope.launch {
             repository.getJournalStream(id).collect { journal ->
                 Log.d(TAG, "ID: $id")
-                Log.d(TAG, "Title: ${journal?.title.toString()}")
-                Log.d(TAG, "Content: ${journal?.content.toString()}")
+                Log.d(TAG, "Title in Journal: ${journal?.title.toString()}")
+                Log.d(TAG, "Content in Journal: ${journal?.content.toString()}")
                 journal?.let {
                     setTitle(it.title)
                     setContent(it.content)
                 }
+                Log.d(TAG, "Title in Field: ${title.value}")
+                Log.d(TAG, "Content in Field: ${content.value}")
             }
         }
     }

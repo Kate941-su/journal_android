@@ -71,6 +71,15 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
 
     DisposableEffect(Unit) {
         onDispose {
+            viewModel.setTitle("")
+            viewModel.setContent("")
+        }
+    }
+
+    // End Initialize
+    EditContents(
+        journalId = journalId,
+        onBackMainScreen = {
             if (title.value.isNotEmpty() || content.value.isNotEmpty()) {
                 viewModel.onSave(
                     journal = Journal(
@@ -79,21 +88,14 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
                         title = title.value,
                         content = content.value,
                     )
-                )
+                ) {
+                    // Completion handler
+                    onBackMainScreen()
+                }
+            } else {
+                onBackMainScreen()
             }
-            viewModel.setTitle("")
-            viewModel.setContent("")
-        }
-    }
-
-    val onBackMain: VoidCallback = {
-        onBackMainScreen()
-    }
-
-    // End Initialize
-    EditContents(
-        journalId = journalId,
-        onBackMainScreen = onBackMain,
+        },
         title = title.value,
         onTitleChanged = {
             viewModel.setTitle(it)
@@ -105,10 +107,11 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
         onTapCascadeMenu = { isExpanded = true },
         onDismissRequest = { isExpanded = false },
         isExpanded = isExpanded,
-        onClickSave = onBackMain,
+        onClickSave = onBackMainScreen,
         onClickDelete = {
-            viewModel.deleteJournalById(journalId)
-            onBackMainScreen()
+            viewModel.deleteJournalById(journalId) {
+                onBackMainScreen()
+            }
         },
     )
 }

@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -72,6 +73,11 @@ fun MainScreen(
     val date by viewModel.monthlyDate.collectAsState()
     val monthlyDays by viewModel.monthlyDays.collectAsState()
     val allJournals by viewModel.allJournals.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.initializeMainScreen()
+    }
+
     MainContent(
         count = count.count,
         date = date,
