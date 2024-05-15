@@ -1,5 +1,6 @@
 package com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -39,13 +40,19 @@ class MainScreenViewModel @Inject constructor(private val journalRepository: Jou
     private val _allJournals = MutableStateFlow<List<Journal>>(emptyList())
     val allJournals: StateFlow<List<Journal>> = _allJournals.asStateFlow()
 
+    companion object {
+        private val TAG = MainScreenViewModel::class.java.simpleName
+    }
+
     init {
         initializeMainScreen()
     }
 
     fun initializeMainScreen() {
         viewModelScope.launch {
+            val dummy = journalRepository.getAllJournalStream().first()
             _allJournals.value = journalRepository.getAllJournalStream().first()
+            Log.d(TAG, dummy.toString())
         }
     }
 

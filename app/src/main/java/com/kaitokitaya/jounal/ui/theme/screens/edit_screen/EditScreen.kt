@@ -76,26 +76,28 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
         }
     }
 
+    val saveJournalAndBackMainScreen: VoidCallback = {
+        if (title.value.isNotEmpty() || content.value.isNotEmpty()) {
+            viewModel.onSave(
+                journal = Journal(
+                    id = journalId,
+                    date = localDate,
+                    title = title.value,
+                    content = content.value,
+                )
+            ) {
+                // Completion handler
+                onBackMainScreen()
+            }
+        } else {
+            onBackMainScreen()
+        }
+    }
+
     // End Initialize
     EditContents(
         journalId = journalId,
-        onBackMainScreen = {
-            if (title.value.isNotEmpty() || content.value.isNotEmpty()) {
-                viewModel.onSave(
-                    journal = Journal(
-                        id = journalId,
-                        date = localDate,
-                        title = title.value,
-                        content = content.value,
-                    )
-                ) {
-                    // Completion handler
-                    onBackMainScreen()
-                }
-            } else {
-                onBackMainScreen()
-            }
-        },
+        onBackMainScreen = saveJournalAndBackMainScreen,
         title = title.value,
         onTitleChanged = {
             viewModel.setTitle(it)
@@ -107,7 +109,7 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
         onTapCascadeMenu = { isExpanded = true },
         onDismissRequest = { isExpanded = false },
         isExpanded = isExpanded,
-        onClickSave = onBackMainScreen,
+        onClickSave = saveJournalAndBackMainScreen,
         onClickDelete = {
             viewModel.deleteJournalById(journalId) {
                 onBackMainScreen()

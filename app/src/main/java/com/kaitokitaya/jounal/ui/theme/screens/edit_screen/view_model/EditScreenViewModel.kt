@@ -17,9 +17,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,11 +37,22 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
     fun onSave(journal: Journal, completion: VoidCallback? = null) {
         viewModelScope.launch {
             val result = repository.getJournalStream(journal.id).firstOrNull()
+            Log.d(TAG, "Result of getJournalStream(): $result")
             if (result == null) {
                 repository.insertJournal(journal)
             } else {
-                repository.updateJournal(journal)
+                // Update could not work unless pk match as journal.
+                try {
+                    val journalWithPk = journal.copy(primKey = result.primKey)
+                    Log.d(TAG, "Add pk to journal: $journalWithPk")
+                    repository.updateJournal(journalWithPk)
+                } catch (e: Exception){
+                    // No error happens.
+                    Log.d(TAG, e.toString())
+                }
             }
+            val dummy = repository.getAllJournalStream().first()
+            Log.d(TAG, "Result of getAllJournalStream(): $dummy")
             completion?.invoke()
         }
     }
@@ -89,7 +102,7 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
 
 
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = EditScreenViewModel::class.java.simpleName
     }
 
 

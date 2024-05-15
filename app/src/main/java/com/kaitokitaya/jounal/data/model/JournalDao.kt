@@ -46,7 +46,8 @@ abstract class JournalDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): JournalDatabase {
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, JournalDatabase::class.java, "journal_database").build()
+                Room.databaseBuilder(context, JournalDatabase::class.java, "journal_database")
+                    .setJournalMode(JournalMode.TRUNCATE).build()
                     .also { Instance = it }
             }
         }

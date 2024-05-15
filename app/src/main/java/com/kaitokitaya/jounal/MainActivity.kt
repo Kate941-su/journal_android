@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        private val TAG = this::class.java.simpleName
+        private val TAG = MainActivity::class.java.simpleName
     }
 
 }
