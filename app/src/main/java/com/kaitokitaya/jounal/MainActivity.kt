@@ -4,16 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.EditScreen
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreenViewModel
-import com.kaitokitaya.jounal.ui.theme.theme.JounalTheme
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.MainScreen
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
+import com.kaitokitaya.jounal.ui.theme.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 enum class AppPath(val path: String) {
@@ -29,7 +28,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val mainScreenViewModel: MainScreenViewModel = viewModel()
             val editScreenViewModel: EditScreenViewModel = viewModel()
-            JounalTheme {
+            AppTheme {
                 NavHost(navController = navController, startDestination = "main_screen") {
                     composable(AppPath.MAIN_SCREEN.path) {
 //                        You can get context by LocalContext ↓

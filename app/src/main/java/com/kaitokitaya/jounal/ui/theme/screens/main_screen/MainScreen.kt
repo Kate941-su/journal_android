@@ -36,9 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,17 +43,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.components.JournalPreviewCard
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
 import com.kaitokitaya.jounal.ui.theme.util.Util
 import java.time.LocalDate
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.repository.MockedJournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
-import com.kaitokitaya.jounal.ui.theme.theme.AppColor
 import kotlin.math.ceil
 
 private const val TAG = "MainScreen"
@@ -114,7 +107,6 @@ fun MainContent(
                     }
                 },
                 colors = topAppBarColors(
-                    containerColor = AppColor.appBarColorLightTheme,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {

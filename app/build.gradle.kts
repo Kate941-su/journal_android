@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

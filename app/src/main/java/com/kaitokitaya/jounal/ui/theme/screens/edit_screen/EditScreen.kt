@@ -47,7 +47,6 @@ import com.kaitokitaya.jounal.type_define.VoidCallback
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.ui_data.DropDownItem
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.screens.shared_components.JournalAppDropDownMenu
-import com.kaitokitaya.jounal.ui.theme.theme.AppColor
 import com.kaitokitaya.jounal.ui.theme.util.Util
 import kotlinx.coroutines.launch
 
@@ -154,7 +153,6 @@ fun EditContents(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppColor.appBarColorLightTheme,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 actions = {
