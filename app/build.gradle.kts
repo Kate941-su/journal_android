@@ -16,9 +16,12 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.kaitokitaya.jounal.CustomTestRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 
@@ -39,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
 }
 
@@ -55,7 +58,8 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,7 +72,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
 
-    // To use Kotlin annotation processing tool (kapt)
+    // To use Kotlin annotation processing tool (KSP)
     ksp(libs.androidx.room.compiler)
     // To use Kotlin Symbol Processing (KSP)
     ksp(libs.androidx.room.compiler)
@@ -95,4 +99,30 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.dagger.compiler)
     ksp(libs.hilt.compiler)
+
+    testImplementation(libs.hilt.android.testing)
+    // ...with Kotlin.
+    kspTest(libs.hilt.android.compiler)
+    // ...with Java.
+    testAnnotationProcessor(libs.hilt.android.compiler)
+
+    // For instrumented tests.
+    androidTestImplementation(libs.hilt.android.testing)
+    // ...with Kotlin.
+    kspAndroidTest(libs.hilt.android.compiler)
+    // ...with Java.
+    androidTestAnnotationProcessor(libs.hilt.android.compiler)
+
+    // TestRunner
+    testImplementation(libs.androidx.junit.ktx)
+
+    testImplementation(libs.robolectric)
+
+    // MockK
+    androidTestImplementation(libs.mockk.android)
+    testImplementation(libs.mockk)
+
+    // Room Testing
+    testImplementation(libs.androidx.room.testing)
+
 }

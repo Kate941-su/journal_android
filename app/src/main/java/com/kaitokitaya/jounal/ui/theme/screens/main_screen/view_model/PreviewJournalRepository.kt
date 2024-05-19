@@ -1,11 +1,12 @@
-package com.kaitokitaya.jounal.repository
+package com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model
 
 import com.kaitokitaya.jounal.data.model.Journal
+import com.kaitokitaya.jounal.repository.JournalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDate
 
-class MockedJournalRepository: JournalRepository {
+class PreviewJournalRepository: JournalRepository {
     override suspend fun insertJournal(journal: Journal) {}
 
     override suspend fun updateJournal(journal: Journal) {}

@@ -52,6 +52,4 @@ abstract class JournalDatabase : RoomDatabase() {
             }
         }
     }
-
-
 }

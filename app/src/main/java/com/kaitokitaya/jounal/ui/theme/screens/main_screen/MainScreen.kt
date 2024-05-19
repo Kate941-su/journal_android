@@ -1,8 +1,6 @@
 package com.kaitokitaya.jounal.ui.theme.screens.main_screen
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,18 +11,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,8 +42,8 @@ import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
 import com.kaitokitaya.jounal.ui.theme.util.Util
 import java.time.LocalDate
 import com.kaitokitaya.jounal.data.model.Journal
-import com.kaitokitaya.jounal.repository.MockedJournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
+import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.PreviewJournalRepository
 import kotlin.math.ceil
 
 private const val TAG = "MainScreen"
@@ -62,7 +56,6 @@ fun MainScreen(
     onTapDate: (Int) -> Unit
 ) {
     rememberTopAppBarState()
-    val count by viewModel.count.collectAsState()
     val date by viewModel.monthlyDate.collectAsState()
     val monthlyDays by viewModel.monthlyDays.collectAsState()
     val allJournals by viewModel.allJournals.collectAsState()
@@ -72,7 +65,6 @@ fun MainScreen(
     }
 
     MainContent(
-        count = count.count,
         date = date,
         monthlyDays = monthlyDays,
         allJournals = allJournals,
@@ -86,7 +78,6 @@ fun MainScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(
-    count: Int,
     date: LocalDate,
     monthlyDays: List<Int?>,
     allJournals: List<Journal>,
@@ -110,7 +101,7 @@ fun MainContent(
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text("Calender $count")
+                    Text("Calender")
                 },
                 modifier = Modifier.padding(0.dp),
                 actions = {
@@ -132,10 +123,9 @@ fun MainContent(
             MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
             WeeklyBar()
             MonthlyContents(month = date, monthlyDays = monthlyDays, allJournals = allJournals, onTapDate = onTapDate)
-            Divider()
+            HorizontalDivider()
             Box(
                 modifier = Modifier
-                    .background(color = Color.Red)
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
@@ -153,14 +143,14 @@ fun MonthlyBar(date: LocalDate, forwardDate: VoidCallback, backDate: VoidCallbac
         modifier = Modifier.fillMaxWidth()
     ) {
         IconButton(onClick = backDate) {
-            Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "previous")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "previous")
         }
         Text(text = "${date.month}", fontSize = 24.sp)
         Text(
             text = "${date.year}", modifier = Modifier.padding(8.dp), fontSize = 24.sp
         )
         IconButton(onClick = forwardDate) {
-            Icon(Icons.Default.KeyboardArrowRight, contentDescription = "next")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "next")
         }
     }
 }
@@ -261,7 +251,7 @@ fun MonthlyContentItem(
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen(viewModel = MainScreenViewModel(journalRepository = MockedJournalRepository())) {
+    MainScreen(viewModel = MainScreenViewModel(journalRepository = PreviewJournalRepository())) {
 
     }
 }
