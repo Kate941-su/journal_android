@@ -1,6 +1,7 @@
 package com.kaitokitaya.jounal.data.model
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
@@ -34,7 +35,10 @@ interface JournalDAO {
 @TypeConverters(LocalDateConverter::class)
 @Database(
     entities = [Journal::class],
-    version = 1
+    version = 2,
+    autoMigrations =  [
+        AutoMigration(from = 1, to = 2)
+    ]
 )
 abstract class JournalDatabase : RoomDatabase() {
 

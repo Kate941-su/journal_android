@@ -22,6 +22,8 @@ data class Journal(
     val title: String,
     @ColumnInfo(name = "content")
     val content: String,
+    @ColumnInfo(name = "emotion", defaultValue = "")
+    val emotion: String
 )
 
 class LocalDateConverter {
