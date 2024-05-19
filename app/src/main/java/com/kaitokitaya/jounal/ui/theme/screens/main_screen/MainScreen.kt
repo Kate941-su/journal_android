@@ -2,6 +2,7 @@ package com.kaitokitaya.jounal.ui.theme.screens.main_screen
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -30,8 +32,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +50,8 @@ import java.time.LocalDate
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.type_define.VoidCallback
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.PreviewJournalRepository
+import com.kaitokitaya.jounal.ui.theme.static_data.WeekDays
+import com.kaitokitaya.jounal.ui.theme.theme.outlineDark
 import kotlin.math.ceil
 
 private const val TAG = "MainScreen"
@@ -59,6 +67,9 @@ fun MainScreen(
     val date by viewModel.monthlyDate.collectAsState()
     val monthlyDays by viewModel.monthlyDays.collectAsState()
     val allJournals by viewModel.allJournals.collectAsState()
+    var today by rememberSaveable {
+        mutableStateOf(LocalDate.now())
+    }
 
     LaunchedEffect(Unit) {
         viewModel.initializeMainScreen()
@@ -66,6 +77,7 @@ fun MainScreen(
 
     MainContent(
         date = date,
+        today = today,
         monthlyDays = monthlyDays,
         allJournals = allJournals,
         increase = { viewModel.increase() },
@@ -79,6 +91,7 @@ fun MainScreen(
 @Composable
 fun MainContent(
     date: LocalDate,
+    today: LocalDate,
     monthlyDays: List<Int?>,
     allJournals: List<Journal>,
     increase: VoidCallback,
@@ -89,14 +102,15 @@ fun MainContent(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = ""
-                        )
-                    }
-                },
+                // After v1 release
+//                navigationIcon = {
+//                    IconButton(onClick = { }) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Menu,
+//                            contentDescription = ""
+//                        )
+//                    }
+//                },
                 colors = topAppBarColors(
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
@@ -109,11 +123,6 @@ fun MainContent(
                 },
             )
         },
-        floatingActionButton = {
-            IconButton(onClick = increase) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-            }
-        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -122,7 +131,13 @@ fun MainContent(
         ) {
             MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
             WeeklyBar()
-            MonthlyContents(month = date, monthlyDays = monthlyDays, allJournals = allJournals, onTapDate = onTapDate)
+            MonthlyContents(
+                today = today,
+                month = date,
+                monthlyDays = monthlyDays,
+                allJournals = allJournals,
+                onTapDate = onTapDate
+            )
             HorizontalDivider()
             Box(
                 modifier = Modifier
@@ -158,25 +173,31 @@ fun MonthlyBar(date: LocalDate, forwardDate: VoidCallback, backDate: VoidCallbac
 @Composable
 fun WeeklyBar() {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        StaticData.weekDays.forEach {
+        WeekDays.values().forEach {
             DayItem(day = it, modifier = Modifier.padding(2.dp))
         }
     }
 }
 
 @Composable
-fun DayItem(day: String, modifier: Modifier = Modifier) {
+fun DayItem(day: WeekDays, modifier: Modifier = Modifier) {
+    var labelColor: Color = outlineDark
+    if (day == WeekDays.SUN) {
+        labelColor = Color.Red
+    } else if (day == WeekDays.STU) {
+        labelColor = Color.Blue
+    }
     Box(
         modifier = modifier
-            .background(color = Color.Red)
+            .background(color = labelColor)
             .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8, 24.dp)
     ) {
         Text(
             textAlign = TextAlign.Center,
             softWrap = false,
-            text = day,
+            text = day.name,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
+            color = Color.White,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -184,7 +205,13 @@ fun DayItem(day: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MonthlyContents(month: LocalDate, monthlyDays: List<Int?>, allJournals: List<Journal>, onTapDate: (Int) -> Unit) {
+fun MonthlyContents(
+    today: LocalDate,
+    month: LocalDate,
+    monthlyDays: List<Int?>,
+    allJournals: List<Journal>,
+    onTapDate: (Int) -> Unit
+) {
     Column {
         val outerLoopNum = ceil(monthlyDays.size.toFloat() / WEEK_DAYS).toInt()
         var count = 0
@@ -193,6 +220,7 @@ fun MonthlyContents(month: LocalDate, monthlyDays: List<Int?>, allJournals: List
                 for (j in 0 until WEEK_DAYS) {
                     MonthlyContentItem(
                         day = monthlyDays[count],
+                        today = today,
                         localDate = month,
                         modifier = Modifier.padding(all = 2.dp),
                         allJournals = allJournals,
@@ -208,6 +236,7 @@ fun MonthlyContents(month: LocalDate, monthlyDays: List<Int?>, allJournals: List
 @Composable
 fun MonthlyContentItem(
     day: Int?,
+    today: LocalDate,
     localDate: LocalDate,
     modifier: Modifier = Modifier,
     allJournals: List<Journal>,
@@ -238,6 +267,14 @@ fun MonthlyContentItem(
             }
             .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8)
     ) {
+        if (localDate.year == today.year && localDate.dayOfMonth == today.dayOfMonth && day == today.dayOfMonth) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+            )
+        }
         Text(
             textAlign = TextAlign.Center,
             text = "${day ?: ""}",
