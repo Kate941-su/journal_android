@@ -23,7 +23,8 @@ class PreviewJournalRepository: JournalRepository {
                 id = 0,
                 date = LocalDate.now(),
                 title = "DUMMY",
-                content = "DUMMY CONTENT"
+                content = "DUMMY CONTENT",
+                emotion = "",
             )
         )
         return flowOf(mockJournals)

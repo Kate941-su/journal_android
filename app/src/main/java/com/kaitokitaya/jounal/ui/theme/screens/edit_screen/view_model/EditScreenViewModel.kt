@@ -9,6 +9,7 @@ import com.kaitokitaya.jounal.data.model.JournalDatabase
 import com.kaitokitaya.jounal.repository.JournalRepository
 import com.kaitokitaya.jounal.repository.RoomJournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
+import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.view_model_data.EmotionEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -29,6 +30,9 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
 
     private val _title = MutableStateFlow<String>("")
     var title: StateFlow<String> = _title.asStateFlow()
+
+    private val _emotion = MutableStateFlow(EmotionEnum.GOOD)
+    var emotion: StateFlow<EmotionEnum> = _emotion.asStateFlow()
 
     private val _content = MutableStateFlow<String>("")
     var content: StateFlow<String> = _content.asStateFlow()
@@ -70,6 +74,12 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
     fun setTitle(title: String) {
         _title.update {
             title
+        }
+    }
+
+    fun setEmotion(emotion: EmotionEnum) {
+        _emotion.update {
+            emotion
         }
     }
 

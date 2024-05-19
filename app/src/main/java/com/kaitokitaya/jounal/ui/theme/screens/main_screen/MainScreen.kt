@@ -267,7 +267,7 @@ fun MonthlyContentItem(
             }
             .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8)
     ) {
-        if (localDate.year == today.year && localDate.dayOfMonth == today.dayOfMonth && day == today.dayOfMonth) {
+        if (localDate.year == today.year && localDate.month == today.month && day == today.dayOfMonth) {
             Box(
                 modifier = Modifier
                     .size(36.dp)

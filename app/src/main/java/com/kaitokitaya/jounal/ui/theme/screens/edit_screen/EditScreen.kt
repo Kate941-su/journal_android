@@ -1,11 +1,17 @@
 package com.kaitokitaya.jounal.ui.theme.screens.edit_screen
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -16,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -26,7 +33,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,8 +45,11 @@ import androidx.compose.ui.unit.sp
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.type_define.VoidCallback
 import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreenViewModel
+import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.view_model_data.EmotionEnum
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.PreviewJournalRepository
 import com.kaitokitaya.jounal.ui.theme.screens.shared_components.JournalAppDropDownMenu
+import com.kaitokitaya.jounal.ui.theme.screens.shared_components.NoRippleTextButton
+import com.kaitokitaya.jounal.ui.theme.theme.tertiaryLight
 import com.kaitokitaya.jounal.ui.theme.util.Util
 
 private const val TAG = "Edit Screen"
@@ -48,6 +61,7 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
     val localDate = Util.getLocalDateFromId(journalId)
     val title = viewModel.title.collectAsState()
     val content = viewModel.content.collectAsState()
+    val emotion = viewModel.emotion.collectAsState()
 
     var isExpanded by remember {
         mutableStateOf(false)
@@ -72,6 +86,7 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
                     date = localDate,
                     title = title.value,
                     content = content.value,
+                    emotion = "",
                 )
             ) {
                 // Completion handler
@@ -89,6 +104,10 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
         title = title.value,
         onTitleChanged = {
             viewModel.setTitle(it)
+        },
+        emotion = emotion.value,
+        onEmotionChanged = {
+            viewModel.setEmotion(it)
         },
         content = content.value,
         onContentChanged = {
@@ -113,6 +132,8 @@ fun EditContents(
     onBackMainScreen: VoidCallback,
     title: String,
     onTitleChanged: (String) -> Unit,
+    emotion: EmotionEnum,
+    onEmotionChanged: (EmotionEnum) -> Unit,
     content: String,
     onContentChanged: (String) -> Unit,
     onTapCascadeMenu: (Boolean) -> Unit,
@@ -174,6 +195,31 @@ fun EditContents(
                     .fillMaxWidth()
                     .padding(12.dp)
             )
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text("How do you feel now?", style = TextStyle(fontWeight = FontWeight.Bold))
+                Row {
+                    EmotionEnum.entries.forEach {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (emotion == it) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape)
+                                        .background(tertiaryLight)
+                                )
+                            }
+//                            TextButton(onClick = { onEmotionChanged(it) },) {
+//                                Text(it.emotion)
+//                            }
+                            NoRippleTextButton<EmotionEnum>(
+                                onClick = { onEmotionChanged(it!!) },
+                                something = it,
+                                text = it.emotion
+                            )
+                        }
+                    }
+                }
+            }
             TextField(
                 value = content,
                 textStyle = TextStyle(fontSize = 18.sp),
