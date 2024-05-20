@@ -1,6 +1,8 @@
 package com.kaitokitaya.jounal.ui.theme.screens.main_screen
 
+import android.graphics.pdf.PdfDocument.Page
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,8 +12,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -32,17 +39,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material.swipeable
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
 import com.kaitokitaya.jounal.ui.theme.util.Util
@@ -56,8 +67,11 @@ import kotlin.math.ceil
 
 private const val TAG = "MainScreen"
 private const val WEEK_DAYS = 7
+private const val PAGE_COUNT = 10000
+private const val INITIAL_PAGE = PAGE_COUNT / 2
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainScreenViewModel,
@@ -67,12 +81,23 @@ fun MainScreen(
     val date by viewModel.monthlyDate.collectAsState()
     val monthlyDays by viewModel.monthlyDays.collectAsState()
     val allJournals by viewModel.allJournals.collectAsState()
+    var currentPage by rememberSaveable {
+        mutableIntStateOf(INITIAL_PAGE)
+    }
+    val pagerState = rememberPagerState(pageCount = { PAGE_COUNT }, initialPage = INITIAL_PAGE)
     var today by rememberSaveable {
         mutableStateOf(LocalDate.now())
     }
-
     LaunchedEffect(Unit) {
         viewModel.initializeMainScreen()
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            if (currentPage < page) {
+                viewModel.forwardMonth()
+            } else if (currentPage > page){
+                viewModel.backMonth()
+            }
+            currentPage = page
+        }
     }
 
     MainContent(
@@ -84,10 +109,11 @@ fun MainScreen(
         forwardDate = { viewModel.forwardMonth() },
         backDate = { viewModel.backMonth() },
         onTapDate = onTapDate,
+        pagerState = pagerState,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainContent(
     date: LocalDate,
@@ -98,6 +124,7 @@ fun MainContent(
     forwardDate: VoidCallback,
     backDate: VoidCallback,
     onTapDate: (Int) -> Unit,
+    pagerState: PagerState,
 ) {
     Scaffold(
         topBar = {
@@ -136,7 +163,8 @@ fun MainContent(
                 month = date,
                 monthlyDays = monthlyDays,
                 allJournals = allJournals,
-                onTapDate = onTapDate
+                onTapDate = onTapDate,
+                pagerState = pagerState
             )
             HorizontalDivider()
             Box(
@@ -204,29 +232,35 @@ fun DayItem(day: WeekDays, modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MonthlyContents(
     today: LocalDate,
     month: LocalDate,
     monthlyDays: List<Int?>,
     allJournals: List<Journal>,
+    pagerState: PagerState,
     onTapDate: (Int) -> Unit
 ) {
-    Column {
-        val outerLoopNum = ceil(monthlyDays.size.toFloat() / WEEK_DAYS).toInt()
-        var count = 0
-        for (i in 0 until outerLoopNum) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                for (j in 0 until WEEK_DAYS) {
-                    MonthlyContentItem(
-                        day = monthlyDays[count],
-                        today = today,
-                        localDate = month,
-                        modifier = Modifier.padding(all = 2.dp),
-                        allJournals = allJournals,
-                        onTapDate = onTapDate
-                    )
-                    count++
+    HorizontalPager(
+        state = pagerState
+    ) {page ->
+        Column {
+            val outerLoopNum = ceil(monthlyDays.size.toFloat() / WEEK_DAYS).toInt()
+            var count = 0
+            for (i in 0 until outerLoopNum) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    for (j in 0 until WEEK_DAYS) {
+                        MonthlyContentItem(
+                            day = monthlyDays[count],
+                            today = today,
+                            localDate = month,
+                            modifier = Modifier.padding(all = 2.dp),
+                            allJournals = allJournals,
+                            onTapDate = onTapDate
+                        )
+                        count++
+                    }
                 }
             }
         }
