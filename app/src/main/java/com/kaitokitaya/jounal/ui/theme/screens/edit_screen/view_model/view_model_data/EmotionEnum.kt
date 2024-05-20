@@ -1,5 +1,6 @@
 package com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.view_model_data
 
+import android.util.Log
 import androidx.compose.material3.Text
 
 enum class EmotionEnum(val emotion: String) {
@@ -8,5 +9,27 @@ enum class EmotionEnum(val emotion: String) {
     BAD("☔️"),
     RAGE("⚡️"),
     CONGRATS("️🎉"),
-    LOVE("❤️")
+    LOVE("❤️");
+
+    companion object {
+        fun fromString(emotionString: String): EmotionEnum {
+            return when (emotionString) {
+                "☀️" -> GOOD
+                "☁️" -> CLOUDY
+                "☂️" -> BAD
+                "⚡️" -> RAGE
+                "🎉" -> CONGRATS
+                "❤️" -> LOVE
+                else -> {
+                    // Valid from canary test
+//                    assert(false) {"Get unexpected character from DB"}
+                    Log.d(TAG, "Get unexpected character from DB")
+                    return GOOD
+                }
+            }
+        }
+        private val TAG = EmotionEnum::class.java.simpleName
+    }
+
+
 }

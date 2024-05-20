@@ -103,6 +103,7 @@ class EditScreenViewModel @Inject constructor(private val repository: JournalRep
                 journal?.let {
                     setTitle(it.title)
                     setContent(it.content)
+                    setEmotion(EmotionEnum.fromString(it.emotion))
                 }
                 Log.d(TAG, "Title in Field: ${title.value}")
                 Log.d(TAG, "Content in Field: ${content.value}")

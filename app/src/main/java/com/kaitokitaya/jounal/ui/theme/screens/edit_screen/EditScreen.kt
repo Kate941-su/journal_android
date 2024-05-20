@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -75,6 +76,7 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
         onDispose {
             viewModel.setTitle("")
             viewModel.setContent("")
+            viewModel.setEmotion(EmotionEnum.GOOD)
         }
     }
 
@@ -86,7 +88,7 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
                     date = localDate,
                     title = title.value,
                     content = content.value,
-                    emotion = "",
+                    emotion = emotion.value.emotion,
                 )
             ) {
                 // Completion handler
@@ -149,7 +151,7 @@ fun EditContents(
                 navigationIcon = {
                     IconButton(onClick = onBackMainScreen) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = ""
                         )
                     }
@@ -208,9 +210,6 @@ fun EditContents(
                                         .background(tertiaryLight)
                                 )
                             }
-//                            TextButton(onClick = { onEmotionChanged(it) },) {
-//                                Text(it.emotion)
-//                            }
                             NoRippleTextButton<EmotionEnum>(
                                 onClick = { onEmotionChanged(it!!) },
                                 something = it,
