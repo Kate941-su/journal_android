@@ -1,8 +1,11 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
 
 android {
@@ -44,6 +47,18 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.13"
     }
+
+    ktlint {
+        android = true // Enable Android-specific linting rules
+        ignoreFailures = true // Fail the build if KtLint finds any issues
+        reporters {
+            reporter(ReporterType.PLAIN)
+            reporter(ReporterType.CHECKSTYLE)
+        }
+    }
+
+    // Auto formatting before executing build.
+    tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 }
 
 dependencies {
@@ -101,6 +116,11 @@ dependencies {
     ksp(libs.dagger.compiler)
     ksp(libs.hilt.compiler)
 
+//    // Retrofit dependency
+//    implementation(libs.retrofit)
+//    implementation(libs.converter.gson)
+
+    // Test dependencies
     testImplementation(libs.hilt.android.testing)
     // ...with Kotlin.
     kspTest(libs.hilt.android.compiler)
@@ -125,5 +145,4 @@ dependencies {
 
     // Room Testing
     testImplementation(libs.androidx.room.testing)
-
 }

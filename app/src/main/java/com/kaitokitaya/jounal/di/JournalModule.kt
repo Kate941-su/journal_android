@@ -15,16 +15,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object JournalModule {
-
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): JournalDatabase = JournalDatabase.getDatabase(context = context)
+    fun provideAppDatabase(
+        @ApplicationContext context: Context,
+    ): JournalDatabase = JournalDatabase.getDatabase(context = context)
 
     @Provides
     fun provideJournalDao(database: JournalDatabase): JournalDAO = database.journalDao()
 
     @Provides
     fun provideJournalRepository(journalDAO: JournalDAO): JournalRepository = RoomJournalRepository(journalDAO)
-
-
 }

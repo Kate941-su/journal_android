@@ -11,5 +11,5 @@ enum class WeekDays(name: String) {
     WED("Wed"),
     THU("Thu"),
     FRI("Fri"),
-    STU("Sat");
+    STU("Sat"),
 }

@@ -3,11 +3,9 @@ package com.kaitokitaya.jounal.data.model
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.room.ColumnInfo
-import androidx.room.Database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import androidx.room.TypeConverters
 import java.time.LocalDate
 
 @Entity(tableName = "journal_table")
@@ -23,7 +21,7 @@ data class Journal(
     @ColumnInfo(name = "content")
     val content: String,
     @ColumnInfo(name = "emotion", defaultValue = "")
-    val emotion: String
+    val emotion: String,
 )
 
 class LocalDateConverter {

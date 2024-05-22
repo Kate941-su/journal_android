@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface JournalDAO {
-
     @Insert
     suspend fun insertJournal(journal: Journal)
 
@@ -36,12 +35,11 @@ interface JournalDAO {
 @Database(
     entities = [Journal::class],
     version = 2,
-    autoMigrations =  [
-        AutoMigration(from = 1, to = 2)
-    ]
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2),
+    ],
 )
 abstract class JournalDatabase : RoomDatabase() {
-
     abstract fun journalDao(): JournalDAO
 
     companion object {

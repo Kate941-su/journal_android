@@ -41,7 +41,11 @@ object Util {
         }
     }
 
-    fun createJournalIdFromLocalDate(year: Int, month: Int, day: Int): Int {
+    fun createJournalIdFromLocalDate(
+        year: Int,
+        month: Int,
+        day: Int,
+    ): Int {
         return year * 10000 + month * 100 + day
     }
 
@@ -51,5 +55,4 @@ object Util {
         val day = (id - year * yearToIdTerm - month * monthToIdTerm)
         return LocalDate.of(year, month, day)
     }
-
 }

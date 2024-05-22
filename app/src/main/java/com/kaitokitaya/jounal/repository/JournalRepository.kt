@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface JournalRepository {
     suspend fun insertJournal(journal: Journal)
+
     suspend fun updateJournal(journal: Journal)
 
     suspend fun deleteJournal(journal: Journal)
@@ -12,5 +13,4 @@ interface JournalRepository {
     fun getJournalStream(id: Int): Flow<Journal?>
 
     fun getAllJournalStream(): Flow<List<Journal>>
-
 }

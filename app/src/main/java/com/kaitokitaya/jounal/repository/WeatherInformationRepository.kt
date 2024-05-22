@@ -1,0 +1,3 @@
+package com.kaitokitaya.jounal.repository
+
+interface WeatherInformationRepository

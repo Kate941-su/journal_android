@@ -1,7 +1,6 @@
 package com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.view_model_data
 
 import android.util.Log
-import androidx.compose.material3.Text
 
 enum class EmotionEnum(val emotion: String) {
     GOOD("☀️"),
@@ -9,7 +8,8 @@ enum class EmotionEnum(val emotion: String) {
     BAD("☔️"),
     RAGE("⚡️"),
     CONGRATS("️🎉"),
-    LOVE("❤️");
+    LOVE("❤️"),
+    ;
 
     companion object {
         fun fromString(emotionString: String): EmotionEnum {
@@ -28,8 +28,7 @@ enum class EmotionEnum(val emotion: String) {
                 }
             }
         }
+
         private val TAG = EmotionEnum::class.java.simpleName
     }
-
-
 }

@@ -17,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 enum class AppPath(val path: String) {
     MAIN_SCREEN("main_screen"),
-    EDIT_SCREEN("edit_screen")
+    EDIT_SCREEN("edit_screen"),
 }
 
 @AndroidEntryPoint
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 //                        You can get context by LocalContext ↓
 //                        val context = LocalContext.current
                         MainScreen(mainScreenViewModel) {
-                            Log.d(TAG,"NavHost is going to go to ${AppPath.EDIT_SCREEN.path}")
+                            Log.d(TAG, "NavHost is going to go to ${AppPath.EDIT_SCREEN.path}")
                             navController.navigate("${AppPath.EDIT_SCREEN.path}/$it")
                         }
                     }
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         val journalId = backStackEntry.arguments?.getString("journalId")?.toInt() ?: -1
                         Log.d(TAG, journalId.toString())
                         EditScreen(journalId = journalId, viewModel = editScreenViewModel) {
-                            Log.d(TAG,"NavHost is going to go to ${AppPath.MAIN_SCREEN.path}")
+                            Log.d(TAG, "NavHost is going to go to ${AppPath.MAIN_SCREEN.path}")
                             navController.navigate(AppPath.MAIN_SCREEN.path)
                         }
                     }
@@ -54,5 +54,4 @@ class MainActivity : ComponentActivity() {
     companion object {
         private val TAG = MainActivity::class.java.simpleName
     }
-
 }

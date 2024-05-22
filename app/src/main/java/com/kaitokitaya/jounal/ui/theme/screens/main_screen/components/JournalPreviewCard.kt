@@ -21,23 +21,29 @@ import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 
 @Composable
-fun JournalPreviewCard(title: String, date: LocalDate) {
+fun JournalPreviewCard(
+    title: String,
+    date: LocalDate,
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp)
-            .clickable { },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
-        )
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(15.dp)
+                .clickable { },
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = 10.dp,
+            ),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.AccountCircle, contentDescription = "", modifier = Modifier.padding(16.dp))
             Column {
-                Text(text = title,
+                Text(
+                    text = title,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                    )
+                    fontSize = 24.sp,
+                )
                 Text(text = "$date")
             }
         }

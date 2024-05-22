@@ -1,6 +1,5 @@
 package com.kaitokitaya.jounal.ui.theme.screens.main_screen
 
-import android.graphics.pdf.PdfDocument.Page
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,8 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -50,19 +46,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.swipeable
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
-import com.kaitokitaya.jounal.ui.theme.static_data.StaticData
-import com.kaitokitaya.jounal.ui.theme.util.Util
-import java.time.LocalDate
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.type_define.VoidCallback
+import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.PreviewJournalRepository
 import com.kaitokitaya.jounal.ui.theme.static_data.WeekDays
 import com.kaitokitaya.jounal.ui.theme.theme.outlineDark
+import com.kaitokitaya.jounal.ui.theme.util.Util
+import java.time.LocalDate
 import kotlin.math.ceil
 
 private const val TAG = "MainScreen"
@@ -70,12 +63,11 @@ private const val WEEK_DAYS = 7
 private const val PAGE_COUNT = 10000
 private const val INITIAL_PAGE = PAGE_COUNT / 2
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainScreenViewModel,
-    onTapDate: (Int) -> Unit
+    onTapDate: (Int) -> Unit,
 ) {
     rememberTopAppBarState()
     val date by viewModel.monthlyDate.collectAsState()
@@ -93,7 +85,7 @@ fun MainScreen(
         snapshotFlow { pagerState.currentPage }.collect { page ->
             if (currentPage < page) {
                 viewModel.forwardMonth()
-            } else if (currentPage > page){
+            } else if (currentPage > page) {
                 viewModel.backMonth()
             }
             currentPage = page
@@ -138,9 +130,10 @@ fun MainContent(
 //                        )
 //                    }
 //                },
-                colors = topAppBarColors(
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
+                colors =
+                    topAppBarColors(
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
                 title = {
                     Text("Calender")
                 },
@@ -152,8 +145,9 @@ fun MainContent(
         },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
             MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
@@ -164,33 +158,39 @@ fun MainContent(
                 monthlyDays = monthlyDays,
                 allJournals = allJournals,
                 onTapDate = onTapDate,
-                pagerState = pagerState
+                pagerState = pagerState,
             )
             HorizontalDivider()
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
             ) {
-
             }
         }
     }
 }
 
 @Composable
-fun MonthlyBar(date: LocalDate, forwardDate: VoidCallback, backDate: VoidCallback) {
+fun MonthlyBar(
+    date: LocalDate,
+    forwardDate: VoidCallback,
+    backDate: VoidCallback,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         IconButton(onClick = backDate) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "previous")
         }
         Text(text = "${date.month}", fontSize = 24.sp)
         Text(
-            text = "${date.year}", modifier = Modifier.padding(8.dp), fontSize = 24.sp
+            text = "${date.year}",
+            modifier = Modifier.padding(8.dp),
+            fontSize = 24.sp,
         )
         IconButton(onClick = forwardDate) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "next")
@@ -208,7 +208,10 @@ fun WeeklyBar() {
 }
 
 @Composable
-fun DayItem(day: WeekDays, modifier: Modifier = Modifier) {
+fun DayItem(
+    day: WeekDays,
+    modifier: Modifier = Modifier,
+) {
     var labelColor: Color = outlineDark
     if (day == WeekDays.SUN) {
         labelColor = Color.Red
@@ -216,9 +219,10 @@ fun DayItem(day: WeekDays, modifier: Modifier = Modifier) {
         labelColor = Color.Blue
     }
     Box(
-        modifier = modifier
-            .background(color = labelColor)
-            .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8, 24.dp)
+        modifier =
+            modifier
+                .background(color = labelColor)
+                .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8, 24.dp),
     ) {
         Text(
             textAlign = TextAlign.Center,
@@ -226,8 +230,9 @@ fun DayItem(day: WeekDays, modifier: Modifier = Modifier) {
             text = day.name,
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         )
     }
 }
@@ -240,11 +245,11 @@ fun MonthlyContents(
     monthlyDays: List<Int?>,
     allJournals: List<Journal>,
     pagerState: PagerState,
-    onTapDate: (Int) -> Unit
+    onTapDate: (Int) -> Unit,
 ) {
     HorizontalPager(
-        state = pagerState
-    ) {page ->
+        state = pagerState,
+    ) { page ->
         Column {
             val outerLoopNum = ceil(monthlyDays.size.toFloat() / WEEK_DAYS).toInt()
             var count = 0
@@ -257,7 +262,7 @@ fun MonthlyContents(
                             localDate = month,
                             modifier = Modifier.padding(all = 2.dp),
                             allJournals = allJournals,
-                            onTapDate = onTapDate
+                            onTapDate = onTapDate,
                         )
                         count++
                     }
@@ -274,55 +279,56 @@ fun MonthlyContentItem(
     localDate: LocalDate,
     modifier: Modifier = Modifier,
     allJournals: List<Journal>,
-    onTapDate: (Int) -> Unit
+    onTapDate: (Int) -> Unit,
 ) {
     val configuration = Util.getPlatformConfiguration()
     val allJournalIds = allJournals.map { it.id }
-    val id = if (day != null) {
-        Util.createJournalIdFromLocalDate(
-            year = localDate.year,
-            month = localDate.month.value,
-            day = day
-        )
-    } else {
-        -1
-    }
+    val id =
+        if (day != null) {
+            Util.createJournalIdFromLocalDate(
+                year = localDate.year,
+                month = localDate.month.value,
+                day = day,
+            )
+        } else {
+            -1
+        }
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .background(
-                color = if (allJournalIds.contains(id)) Color.Blue else Color.Green.copy(alpha = if (day == null) 0.5F else 1F)
-            )
-            .clickable {
-                day?.let {
-                    onTapDate(id)
+        modifier =
+            modifier
+                .background(
+                    color = if (allJournalIds.contains(id)) Color.Blue else Color.Green.copy(alpha = if (day == null) 0.5F else 1F),
+                )
+                .clickable {
+                    day?.let {
+                        onTapDate(id)
+                    }
                 }
-            }
-            .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8)
+                .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8),
     ) {
         if (localDate.year == today.year && localDate.month == today.month && day == today.dayOfMonth) {
             Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+                modifier =
+                    Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .border(width = 1.dp, color = Color.Black, shape = CircleShape),
             )
         }
         Text(
             textAlign = TextAlign.Center,
             text = "${day ?: ""}",
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
-
 
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
     MainScreen(viewModel = MainScreenViewModel(journalRepository = PreviewJournalRepository())) {
-
     }
 }

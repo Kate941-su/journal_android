@@ -3,10 +3,10 @@ package com.kaitokitaya.jounal.test_module
 
 import android.content.Context
 import androidx.room.Room
-import com.kaitokitaya.jounal.mocking.MockedJournalRepository
 import com.kaitokitaya.jounal.data.model.JournalDAO
 import com.kaitokitaya.jounal.data.model.JournalDatabase
 import com.kaitokitaya.jounal.di.JournalModule
+import com.kaitokitaya.jounal.mocking.MockedJournalRepository
 import com.kaitokitaya.jounal.repository.JournalRepository
 import dagger.Module
 import dagger.Provides
@@ -25,7 +25,9 @@ import javax.inject.Singleton
 object FakeJournalModule {
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): JournalDatabase {
+    fun provideAppDatabase(
+        @ApplicationContext context: Context,
+    ): JournalDatabase {
         return Room.inMemoryDatabaseBuilder(context, JournalDatabase::class.java)
             .allowMainThreadQueries().build()
     }

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDate
 
-class MockedJournalRepository: JournalRepository {
+class MockedJournalRepository : JournalRepository {
     override suspend fun insertJournal(journal: Journal) {}
 
     override suspend fun updateJournal(journal: Journal) {}
@@ -18,14 +18,15 @@ class MockedJournalRepository: JournalRepository {
     }
 
     override fun getAllJournalStream(): Flow<List<Journal>> {
-        val mockJournals = listOf(
-            Journal(
-                id = 0,
-                date = LocalDate.now(),
-                title = "DUMMY",
-                content = "DUMMY CONTENT"
+        val mockJournals =
+            listOf(
+                Journal(
+                    id = 0,
+                    date = LocalDate.now(),
+                    title = "DUMMY",
+                    content = "DUMMY CONTENT",
+                ),
             )
-        )
         return flowOf(mockJournals)
     }
 }

@@ -1,7 +1,6 @@
 package com.kaitokitaya.jounal.ui.theme.screens.edit_screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -37,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,8 +54,11 @@ private const val TAG = "Edit Screen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen: VoidCallback) {
-
+fun EditScreen(
+    journalId: Int,
+    viewModel: EditScreenViewModel,
+    onBackMainScreen: VoidCallback,
+) {
     val localDate = Util.getLocalDateFromId(journalId)
     val title = viewModel.title.collectAsState()
     val content = viewModel.content.collectAsState()
@@ -83,13 +83,14 @@ fun EditScreen(journalId: Int, viewModel: EditScreenViewModel, onBackMainScreen:
     val saveJournalAndBackMainScreen: VoidCallback = {
         if (title.value.isNotEmpty() || content.value.isNotEmpty()) {
             viewModel.onSave(
-                journal = Journal(
-                    id = journalId,
-                    date = localDate,
-                    title = title.value,
-                    content = content.value,
-                    emotion = emotion.value.emotion,
-                )
+                journal =
+                    Journal(
+                        id = journalId,
+                        date = localDate,
+                        title = title.value,
+                        content = content.value,
+                        emotion = emotion.value.emotion,
+                    ),
             ) {
                 // Completion handler
                 onBackMainScreen()
@@ -152,21 +153,23 @@ fun EditContents(
                     IconButton(onClick = onBackMainScreen) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = ""
+                            contentDescription = "",
                         )
                     }
                 },
                 title = {
                     Text(
-                        text = "${localDate.dayOfWeek}," +
+                        text =
+                            "${localDate.dayOfWeek}," +
                                 "  ${localDate.month}," +
                                 " ${localDate.dayOfMonth}," +
-                                " ${localDate.year}"
+                                " ${localDate.year}",
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
                 actions = {
                     IconButton(onClick = { onTapCascadeMenu(true) }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "menu")
@@ -182,10 +185,11 @@ fun EditContents(
             onDelete = onClickDelete,
         )
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Top
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            verticalArrangement = Arrangement.Top,
         ) {
             TextField(
                 value = title,
@@ -193,9 +197,10 @@ fun EditContents(
                 textStyle = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
                 label = { Text("Title", style = TextStyle(fontWeight = FontWeight.Bold)) },
                 onValueChange = onTitleChanged,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
             )
             Column(modifier = Modifier.padding(12.dp)) {
                 Text("How do you feel now?", style = TextStyle(fontWeight = FontWeight.Bold))
@@ -204,16 +209,17 @@ fun EditContents(
                         Box(contentAlignment = Alignment.Center) {
                             if (emotion == it) {
                                 Box(
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .clip(CircleShape)
-                                        .background(tertiaryLight)
+                                    modifier =
+                                        Modifier
+                                            .size(36.dp)
+                                            .clip(CircleShape)
+                                            .background(tertiaryLight),
                                 )
                             }
                             NoRippleTextButton<EmotionEnum>(
                                 onClick = { onEmotionChanged(it!!) },
                                 something = it,
-                                text = it.emotion
+                                text = it.emotion,
                             )
                         }
                     }
@@ -224,15 +230,15 @@ fun EditContents(
                 textStyle = TextStyle(fontSize = 18.sp),
                 label = { Text("Text") },
                 onValueChange = onContentChanged,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(12.dp),
             )
         }
     }
 }
-
 
 @Preview(showSystemUi = true)
 @Composable
@@ -240,4 +246,3 @@ fun EditScreenPreview() {
     EditScreen(journalId = 20000101, viewModel = EditScreenViewModel(repository = PreviewJournalRepository())) {
     }
 }
-
