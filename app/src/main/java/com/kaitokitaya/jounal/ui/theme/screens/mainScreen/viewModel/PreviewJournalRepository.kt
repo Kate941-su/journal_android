@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model
+package com.kaitokitaya.jounal.ui.theme.screens.mainScreen.viewModel
 
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.repository.JournalRepository

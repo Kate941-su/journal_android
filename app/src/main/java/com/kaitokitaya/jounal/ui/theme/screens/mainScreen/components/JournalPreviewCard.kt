@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.main_screen.components
+package com.kaitokitaya.jounal.ui.theme.screens.mainScreen.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

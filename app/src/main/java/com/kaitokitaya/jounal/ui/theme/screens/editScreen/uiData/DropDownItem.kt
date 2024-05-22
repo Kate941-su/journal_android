@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.edit_screen.ui_data
+package com.kaitokitaya.jounal.ui.theme.screens.editScreen.uiData
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

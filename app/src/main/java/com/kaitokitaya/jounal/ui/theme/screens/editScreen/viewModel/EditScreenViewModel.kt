@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model
+package com.kaitokitaya.jounal.ui.theme.screens.editScreen.viewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.repository.JournalRepository
 import com.kaitokitaya.jounal.type_define.VoidCallback
-import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.view_model_data.EmotionEnum
+import com.kaitokitaya.jounal.ui.theme.screens.editScreen.viewModel.viewModelData.EmotionEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

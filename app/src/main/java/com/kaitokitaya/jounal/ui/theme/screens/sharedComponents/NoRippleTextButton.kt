@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.shared_components
+package com.kaitokitaya.jounal.ui.theme.screens.sharedComponents
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.ButtonDefaults

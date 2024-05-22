@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.view_model_data
+package com.kaitokitaya.jounal.ui.theme.screens.editScreen.viewModel.viewModelData
 
 import android.util.Log
 

@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.edit_screen
+package com.kaitokitaya.jounal.ui.theme.screens.editScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,11 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.type_define.VoidCallback
-import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreenViewModel
-import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.view_model_data.EmotionEnum
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.PreviewJournalRepository
-import com.kaitokitaya.jounal.ui.theme.screens.shared_components.JournalAppDropDownMenu
-import com.kaitokitaya.jounal.ui.theme.screens.shared_components.NoRippleTextButton
+import com.kaitokitaya.jounal.ui.theme.screens.editScreen.viewModel.EditScreenViewModel
+import com.kaitokitaya.jounal.ui.theme.screens.editScreen.viewModel.viewModelData.EmotionEnum
+import com.kaitokitaya.jounal.ui.theme.screens.mainScreen.viewModel.PreviewJournalRepository
+import com.kaitokitaya.jounal.ui.theme.screens.sharedComponents.JournalAppDropDownMenu
+import com.kaitokitaya.jounal.ui.theme.screens.sharedComponents.NoRippleTextButton
 import com.kaitokitaya.jounal.ui.theme.theme.tertiaryLight
 import com.kaitokitaya.jounal.ui.theme.util.Util
 

@@ -1,4 +1,4 @@
-package com.kaitokitaya.jounal.ui.theme.screens.main_screen
+package com.kaitokitaya.jounal.ui.theme.screens.mainScreen
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -21,15 +20,30 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +51,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -50,11 +65,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.type_define.VoidCallback
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.PreviewJournalRepository
-import com.kaitokitaya.jounal.ui.theme.static_data.WeekDays
+import com.kaitokitaya.jounal.ui.theme.screens.editScreen.uiData.NavigationItem
+import com.kaitokitaya.jounal.ui.theme.screens.mainScreen.viewModel.MainScreenViewModel
+import com.kaitokitaya.jounal.ui.theme.screens.mainScreen.viewModel.PreviewJournalRepository
+import com.kaitokitaya.jounal.ui.theme.staticData.WeekDays
 import com.kaitokitaya.jounal.ui.theme.theme.outlineDark
 import com.kaitokitaya.jounal.ui.theme.util.Util
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import kotlin.math.ceil
 
@@ -69,10 +87,12 @@ fun MainScreen(
     viewModel: MainScreenViewModel,
     onTapDate: (Int) -> Unit,
 ) {
-    rememberTopAppBarState()
     val date by viewModel.monthlyDate.collectAsState()
     val monthlyDays by viewModel.monthlyDays.collectAsState()
     val allJournals by viewModel.allJournals.collectAsState()
+
+    rememberTopAppBarState()
+    // remember states
     var currentPage by rememberSaveable {
         mutableIntStateOf(INITIAL_PAGE)
     }
@@ -80,6 +100,15 @@ fun MainScreen(
     var today by rememberSaveable {
         mutableStateOf(LocalDate.now())
     }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    var selectedItemIndex by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+
+    val onClickNavigationMenu: (Int) -> Unit = { selectedItemIndex = it }
+
     LaunchedEffect(Unit) {
         viewModel.initializeMainScreen()
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -102,6 +131,10 @@ fun MainScreen(
         backDate = { viewModel.backMonth() },
         onTapDate = onTapDate,
         pagerState = pagerState,
+        drawerState = drawerState,
+        scope = scope,
+        selectedItemIndex = selectedItemIndex,
+        onClickNavigationMenu = onClickNavigationMenu,
     )
 }
 
@@ -117,56 +150,104 @@ fun MainContent(
     backDate: VoidCallback,
     onTapDate: (Int) -> Unit,
     pagerState: PagerState,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    selectedItemIndex: Int,
+    onClickNavigationMenu: (Int) -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                // After v1 release
-//                navigationIcon = {
-//                    IconButton(onClick = { }) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Menu,
-//                            contentDescription = ""
-//                        )
-//                    }
-//                },
-                colors =
-                    topAppBarColors(
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                title = {
-                    Text("Calender")
-                },
-                modifier = Modifier.padding(0.dp),
-                actions = {
-                    Log.d(TAG, "TODO: Open/Close hamburger menu")
-                },
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            modifier =
-                Modifier
-                    .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-        ) {
-            MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
-            WeeklyBar()
-            MonthlyContents(
-                today = today,
-                month = date,
-                monthlyDays = monthlyDays,
-                allJournals = allJournals,
-                onTapDate = onTapDate,
-                pagerState = pagerState,
-            )
-            HorizontalDivider()
-            Box(
+    val items =
+        listOf(
+            NavigationItem(
+                title = "Calendar",
+                selectedIcon = Icons.Filled.DateRange,
+                unselectedIcon = Icons.Outlined.DateRange,
+            ),
+            NavigationItem(
+                title = "Timeline",
+                selectedIcon = Icons.Filled.Star,
+                unselectedIcon = Icons.Outlined.Star,
+            ),
+            NavigationItem(
+                title = "Settings",
+                selectedIcon = Icons.Filled.Settings,
+                unselectedIcon = Icons.Outlined.Settings,
+            ),
+            NavigationItem(
+                title = "Information",
+                selectedIcon = Icons.Filled.Info,
+                unselectedIcon = Icons.Outlined.Info,
+            ),
+        )
+
+    ModalNavigationDrawer(drawerContent = {
+        ModalDrawerSheet {
+            items.forEachIndexed { index, item ->
+                NavigationDrawerItem(
+                    label = { Text(item.title) },
+                    selected = index == selectedItemIndex,
+                    onClick = {
+                        onClickNavigationMenu(index)
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    },
+                )
+            }
+        }
+    }, drawerState = drawerState) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "",
+                            )
+                        }
+                    },
+                    colors =
+                        topAppBarColors(
+                            titleContentColor = MaterialTheme.colorScheme.primary,
+                        ),
+                    title = {
+                        Text("Calender")
+                    },
+                    modifier = Modifier.padding(0.dp),
+                    actions = {
+                        Log.d(TAG, "TODO: Open/Close hamburger menu")
+                    },
+                )
+            },
+        ) { innerPadding ->
+            Column(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
+                        .padding(innerPadding),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
+                MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
+                WeeklyBar()
+                MonthlyContents(
+                    today = today,
+                    month = date,
+                    monthlyDays = monthlyDays,
+                    allJournals = allJournals,
+                    onTapDate = onTapDate,
+                    pagerState = pagerState,
+                )
+                HorizontalDivider()
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                ) {
+                }
             }
         }
     }

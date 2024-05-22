@@ -1,8 +1,6 @@
-package com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model
+package com.kaitokitaya.jounal.ui.theme.screens.mainScreen.viewModel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kaitokitaya.jounal.data.model.Journal

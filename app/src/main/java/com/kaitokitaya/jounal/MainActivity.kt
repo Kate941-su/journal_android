@@ -8,10 +8,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.EditScreen
-import com.kaitokitaya.jounal.ui.theme.screens.edit_screen.view_model.EditScreenViewModel
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.MainScreen
-import com.kaitokitaya.jounal.ui.theme.screens.main_screen.view_model.MainScreenViewModel
+import com.kaitokitaya.jounal.ui.theme.screens.editScreen.EditScreen
+import com.kaitokitaya.jounal.ui.theme.screens.editScreen.viewModel.EditScreenViewModel
+import com.kaitokitaya.jounal.ui.theme.screens.mainScreen.MainScreen
+import com.kaitokitaya.jounal.ui.theme.screens.mainScreen.viewModel.MainScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
