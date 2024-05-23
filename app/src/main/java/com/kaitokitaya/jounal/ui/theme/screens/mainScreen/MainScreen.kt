@@ -21,15 +21,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -65,6 +67,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kaitokitaya.jounal.AppPath
 import com.kaitokitaya.jounal.data.model.Journal
 import com.kaitokitaya.jounal.type_define.VoidCallback
 import com.kaitokitaya.jounal.ui.theme.screens.editScreen.uiData.NavigationItem
@@ -88,6 +91,7 @@ private const val INITIAL_PAGE = PAGE_COUNT / 2
 fun MainScreen(
     viewModel: MainScreenViewModel,
     onTapDate: (Int) -> Unit,
+    onTapNavigationItem: (AppPath) -> Unit,
 ) {
     val date by viewModel.monthlyDate.collectAsState()
     val monthlyDays by viewModel.monthlyDays.collectAsState()
@@ -106,10 +110,13 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
 
     var selectedItemIndex by rememberSaveable {
-        mutableIntStateOf(0)
+        mutableStateOf(AppPath.CALENDAR_SCREEN)
     }
 
-    val onClickNavigationMenu: (Int) -> Unit = { selectedItemIndex = it }
+    val onClickNavigationMenu: (AppPath) -> Unit = {
+        selectedItemIndex = it
+        onTapNavigationItem(it)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.initializeMainScreen()
@@ -154,46 +161,108 @@ fun MainContent(
     pagerState: PagerState,
     drawerState: DrawerState,
     scope: CoroutineScope,
-    selectedItemIndex: Int,
-    onClickNavigationMenu: (Int) -> Unit,
+    selectedItemIndex: AppPath,
+    onClickNavigationMenu: (AppPath) -> Unit,
 ) {
     val modalWindowWidth = LocalConfiguration.current.screenWidthDp * 2 / 3
-    val items =
-        listOf(
-            NavigationItem(
-                title = "Calendar",
-                selectedIcon = Icons.Filled.DateRange,
-                unselectedIcon = Icons.Outlined.DateRange,
-            ),
-            NavigationItem(
-                title = "Timeline",
-                selectedIcon = Icons.Filled.Star,
-                unselectedIcon = Icons.Outlined.Star,
-            ),
-            NavigationItem(
-                title = "Settings",
-                selectedIcon = Icons.Filled.Settings,
-                unselectedIcon = Icons.Outlined.Settings,
-            ),
-            NavigationItem(
-                title = "Information",
-                selectedIcon = Icons.Filled.Info,
-                unselectedIcon = Icons.Outlined.Info,
-            ),
-        )
+    val items = AppPath.values().map {
+        when (it) {
+            AppPath.CALENDAR_SCREEN ->
+                NavigationItem(
+                    appPath = it,
+                    title = "Calendar",
+                    selectedIcon = Icons.Filled.DateRange,
+                    unselectedIcon = Icons.Outlined.DateRange,
+                )
+
+            AppPath.EDIT_SCREEN ->
+                NavigationItem(
+                    appPath = it,
+                    title = "Edit",
+                    selectedIcon = Icons.Filled.Create,
+                    unselectedIcon = Icons.Outlined.Create,
+                )
+
+            AppPath.TIME_LINE_SCREEN ->
+                NavigationItem(
+                    appPath = it,
+                    title = "Timeline",
+                    selectedIcon = Icons.Filled.Star,
+                    unselectedIcon = Icons.Outlined.Star,
+                )
+
+            AppPath.SETTINGS_SCREEN ->
+                NavigationItem(
+                    appPath = it,
+                    title = "Settings",
+                    selectedIcon = Icons.Filled.Settings,
+                    unselectedIcon = Icons.Outlined.Settings,
+                )
+            AppPath.UNDEFINED ->
+                NavigationItem(
+                    appPath = it,
+                    title = "Undefined",
+                    selectedIcon = Icons.Filled.Warning,
+                    unselectedIcon = Icons.Outlined.Warning,
+                )
+        }
+    }
+//        listOf(
+//            NavigationItem(
+//                appPath = AppPath.CALENDAR_SCREEN,
+//                title = "Calendar",
+//                selectedIcon = Icons.Filled.DateRange,
+//                unselectedIcon = Icons.Outlined.DateRange,
+//            ),
+//            NavigationItem(
+//                appPath = AppPath.CALENDAR_SCREEN,
+//                title = "Information",
+//                selectedIcon = Icons.Filled.Info,
+//                unselectedIcon = Icons.Outlined.Info,
+//            ),
+//            NavigationItem(
+//                appPath = AppPath.TIME_LINE_SCREEN,
+//                title = "Timeline",
+//                selectedIcon = Icons.Filled.Star,
+//                unselectedIcon = Icons.Outlined.Star,
+//            ),
+//            NavigationItem(
+//                appPath = AppPath.SETTINGS_SCREEN,
+//                title = "Settings",
+//                selectedIcon = Icons.Filled.Settings,
+//                unselectedIcon = Icons.Outlined.Settings,
+//            ),
+//        )
 
     ModalNavigationDrawer(drawerContent = {
         ModalDrawerSheet(modifier = Modifier.width(modalWindowWidth.dp)) {
             items.forEachIndexed { index, item ->
                 NavigationDrawerItem(
                     label = { Text(item.title) },
-                    selected = index == selectedItemIndex,
+                    selected = index == selectedItemIndex.ordinal,
                     onClick = {
-                        onClickNavigationMenu(index)
+                        onClickNavigationMenu(AppPath.getAppPath(index))
                         scope.launch {
                             drawerState.close()
                         }
                     },
+                    icon = {
+                        Icon(
+                            imageVector =
+                            if (index == selectedItemIndex.ordinal) {
+                                item.selectedIcon
+                            } else {
+                                item.unselectedIcon
+                            },
+                            contentDescription = item.title,
+                        )
+                    },
+                    badge = {
+                        item.badgeCount?.let {
+                            Text(text = item.badgeCount.toString())
+                        }
+                    },
+                    modifier = Modifier.padding(16.dp),
                 )
             }
         }
@@ -214,9 +283,9 @@ fun MainContent(
                         }
                     },
                     colors =
-                        topAppBarColors(
-                            titleContentColor = MaterialTheme.colorScheme.primary,
-                        ),
+                    topAppBarColors(
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
                     title = {
                         Text("Calender")
                     },
@@ -229,8 +298,8 @@ fun MainContent(
         ) { innerPadding ->
             Column(
                 modifier =
-                    Modifier
-                        .padding(innerPadding),
+                Modifier
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 MonthlyBar(date = date, forwardDate = forwardDate, backDate = backDate)
@@ -246,9 +315,9 @@ fun MainContent(
                 HorizontalDivider()
                 Box(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
                 ) {
                 }
             }
@@ -304,9 +373,9 @@ fun DayItem(
     }
     Box(
         modifier =
-            modifier
-                .background(color = labelColor)
-                .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8, 24.dp),
+        modifier
+            .background(color = labelColor)
+            .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8, 24.dp),
     ) {
         Text(
             textAlign = TextAlign.Center,
@@ -315,8 +384,8 @@ fun DayItem(
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White,
             modifier =
-                Modifier
-                    .fillMaxWidth(),
+            Modifier
+                .fillMaxWidth(),
         )
     }
 }
@@ -381,24 +450,24 @@ fun MonthlyContentItem(
     Box(
         contentAlignment = Alignment.Center,
         modifier =
-            modifier
-                .background(
-                    color = if (allJournalIds.contains(id)) Color.Blue else Color.Green.copy(alpha = if (day == null) 0.5F else 1F),
-                )
-                .clickable {
-                    day?.let {
-                        onTapDate(id)
-                    }
+        modifier
+            .background(
+                color = if (allJournalIds.contains(id)) Color.Blue else Color.Green.copy(alpha = if (day == null) 0.5F else 1F),
+            )
+            .clickable {
+                day?.let {
+                    onTapDate(id)
                 }
-                .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8),
+            }
+            .size(Util.getPlatformConfiguration().screenWidthDp.dp / 8),
     ) {
         if (localDate.year == today.year && localDate.month == today.month && day == today.dayOfMonth) {
             Box(
                 modifier =
-                    Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .border(width = 1.dp, color = Color.Black, shape = CircleShape),
+                Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .border(width = 1.dp, color = Color.Black, shape = CircleShape),
             )
         }
         Text(
@@ -413,6 +482,5 @@ fun MonthlyContentItem(
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen(viewModel = MainScreenViewModel(journalRepository = PreviewJournalRepository())) {
-    }
+    MainScreen(viewModel = MainScreenViewModel(journalRepository = PreviewJournalRepository()), onTapDate = { _ -> }) {}
 }
