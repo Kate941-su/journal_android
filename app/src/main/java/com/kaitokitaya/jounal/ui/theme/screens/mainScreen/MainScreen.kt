@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -59,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -155,6 +157,7 @@ fun MainContent(
     selectedItemIndex: Int,
     onClickNavigationMenu: (Int) -> Unit,
 ) {
+    val modalWindowWidth = LocalConfiguration.current.screenWidthDp * 2 / 3
     val items =
         listOf(
             NavigationItem(
@@ -180,7 +183,7 @@ fun MainContent(
         )
 
     ModalNavigationDrawer(drawerContent = {
-        ModalDrawerSheet {
+        ModalDrawerSheet(modifier = Modifier.width(modalWindowWidth.dp)) {
             items.forEachIndexed { index, item ->
                 NavigationDrawerItem(
                     label = { Text(item.title) },
