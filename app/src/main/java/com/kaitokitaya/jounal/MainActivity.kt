@@ -12,7 +12,7 @@ import com.kaitokitaya.jounal.ui.theme.screens.editScreen.EditScreen
 import com.kaitokitaya.jounal.ui.theme.screens.editScreen.viewModel.EditScreenViewModel
 import com.kaitokitaya.jounal.ui.theme.screens.mainScreen.MainScreen
 import com.kaitokitaya.jounal.ui.theme.screens.mainScreen.viewModel.MainScreenViewModel
-import com.kaitokitaya.jounal.ui.theme.screens.settingsScreen.uiData.SettingsScreen
+import com.kaitokitaya.jounal.ui.theme.screens.settingsScreen.SettingsScreen
 import com.kaitokitaya.jounal.ui.theme.screens.timeLineScreen.uiData.TimeLineScreen
 import com.kaitokitaya.jounal.ui.theme.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
